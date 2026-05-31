@@ -84,33 +84,18 @@
   const errorState = document.getElementById('search-error');
   const list = document.getElementById('search-list');
 
-  async function loadPagefindScript(): Promise<void> {
-    // @ts-ignore
-    if (window.pagefind) return;
-
-    return new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = '/pagefind/pagefind.js';
-      script.type = 'text/javascript';
-      script.onload = () => resolve();
-      script.onerror = () => reject();
-      document.head.appendChild(script);
-    });
-  }
-
   async function initPagefind(): Promise<boolean> {
     if (pagefind) return true;
     try {
-      await loadPagefindScript();
+      // Use eval to completely hide the import from static analysis
+      // Pagefind is generated after build, so it doesn't exist during Astro build
       // @ts-ignore
-      if (window.pagefind) {
-        // @ts-ignore
-        pagefind = window.pagefind;
-        await pagefind.init();
-        return true;
-      }
-      return false;
-    } catch {
+      const mod = await eval("import('/pagefind/pagefind.js')");
+      pagefind = mod;
+      await pagefind.init();
+      return true;
+    } catch (e) {
+      console.error('Pagefind init error:', e);
       return false;
     }
   }
