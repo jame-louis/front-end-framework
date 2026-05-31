@@ -6,7 +6,8 @@ import rehypeSlug from 'rehype-slug';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 
 export default defineConfig({
-  site: 'https://jame-louis.github.io/course-template-astro/',
+  site: 'https://jame-louis.github.io',
+  base: '/course-template-astro/',
   output: 'static',
   integrations: [mdx(), sitemap()],
   vite: {
