@@ -7,7 +7,7 @@
 - [x] Configure postbuild script
 - [x] Create SearchModal component
 - [x] Add search trigger to navigation
-- [ ] Style search results with highlights (basic excerpt shown)
+- [x] Style search results with highlights (basic excerpt shown)
 - [ ] Multi-language support for Chinese search optimization
 
 ### 4.3 Progress Tracking - DONE

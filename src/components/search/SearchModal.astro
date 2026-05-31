@@ -39,6 +39,22 @@
         <div id="search-list" class="hidden space-y-1"></div>
       </div>
 
+      <style>
+        /* Highlight marks from Pagefind */
+        #search-list mark {
+          background-color: #fde047;
+          color: #1e293b;
+          padding: 0 2px;
+          border-radius: 2px;
+          font-weight: 500;
+        }
+
+        /* Selected state highlight */
+        #search-list a.selected mark {
+          background-color: #facc15;
+        }
+      </style>
+
       <!-- Footer -->
       <div class="px-4 py-2 bg-bg-secondary border-t border-border text-xs text-text-muted flex items-center justify-between">
         <span>按 Enter 打开结果</span>
@@ -57,6 +73,7 @@
 <script>
   let pagefind: any = null;
   let selectedIndex = -1;
+  let currentResults: any[] = [];
 
   const modal = document.getElementById('search-modal');
   const overlay = document.getElementById('search-overlay');
@@ -112,6 +129,14 @@
     list?.classList.toggle('hidden', state !== 'list');
   }
 
+  function getCategoryFromUrl(url: string): { label: string; color: string } {
+    if (url.includes('/lectures/')) return { label: '讲义', color: 'bg-blue-100 text-blue-700' };
+    if (url.includes('/assignments/')) return { label: '作业', color: 'bg-orange-100 text-orange-700' };
+    if (url.includes('/projects/')) return { label: '项目', color: 'bg-purple-100 text-purple-700' };
+    if (url.includes('/materials/')) return { label: '资料', color: 'bg-green-100 text-green-700' };
+    return { label: '页面', color: 'bg-gray-100 text-gray-700' };
+  }
+
   function renderResults(results: any[]) {
     if (!list) return;
     list.innerHTML = '';
@@ -119,12 +144,18 @@
     results.forEach((result, i) => {
       const el = document.createElement('a');
       el.href = result.url;
+      const isSelected = i === selectedIndex;
+      const category = getCategoryFromUrl(result.url);
+
       el.className = `block px-3 py-2.5 rounded-lg transition-colors ${
-        i === selectedIndex ? 'bg-bg-secondary' : 'hover:bg-bg-secondary'
+        isSelected ? 'bg-bg-secondary selected' : 'hover:bg-bg-secondary'
       }`;
       el.innerHTML = `
-        <div class="font-medium text-sm text-text line-clamp-1">${result.meta.title || '无标题'}</div>
-        <div class="text-xs text-text-muted mt-0.5 line-clamp-2">${result.excerpt || ''}</div>
+        <div class="flex items-center gap-2">
+          <span class="text-[10px] px-1.5 py-0.5 rounded font-medium ${category.color}">${category.label}</span>
+          <span class="font-medium text-sm text-text line-clamp-1">${result.meta.title || '无标题'}</span>
+        </div>
+        <div class="text-xs text-text-muted mt-1 line-clamp-2">${result.excerpt || ''}</div>
       `;
       el.addEventListener('click', closeModal);
       list.appendChild(el);
@@ -153,6 +184,7 @@
       showState('no-results');
     } else {
       selectedIndex = 0;
+      currentResults = results;
       renderResults(results);
     }
   }
@@ -166,28 +198,20 @@
 
   // Keyboard navigation
   input?.addEventListener('keydown', (e) => {
-    const items = list?.querySelectorAll('a');
-    if (!items || items.length === 0) return;
+    if (currentResults.length === 0) return;
 
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
-      renderResults(Array.from(items).map(a => ({
-        url: a.href,
-        meta: { title: a.querySelector('.font-medium')?.textContent },
-        excerpt: a.querySelector('.text-xs')?.textContent
-      })));
+      selectedIndex = Math.min(selectedIndex + 1, currentResults.length - 1);
+      renderResults(currentResults);
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       selectedIndex = Math.max(selectedIndex - 1, 0);
-      renderResults(Array.from(items).map(a => ({
-        url: a.href,
-        meta: { title: a.querySelector('.font-medium')?.textContent },
-        excerpt: a.querySelector('.text-xs')?.textContent
-      })));
+      renderResults(currentResults);
     } else if (e.key === 'Enter') {
       e.preventDefault();
-      if (selectedIndex >= 0 && items[selectedIndex]) {
+      const items = list?.querySelectorAll('a');
+      if (selectedIndex >= 0 && items && items[selectedIndex]) {
         items[selectedIndex].click();
       }
     }
