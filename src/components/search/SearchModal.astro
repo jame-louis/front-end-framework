@@ -70,6 +70,8 @@
   </div>
 </div>
 
+<script is:inline src="/pagefind/pagefind.js"></script>
+
 <script>
   let pagefind: any = null;
   let selectedIndex = -1;
@@ -84,20 +86,16 @@
   const errorState = document.getElementById('search-error');
   const list = document.getElementById('search-list');
 
-  async function initPagefind() {
+  async function initPagefind(): Promise<boolean> {
     if (pagefind) return true;
-    try {
-      // Use string concatenation to prevent Vite from analyzing this import at build time
-      // Pagefind is generated after build, so the file doesn't exist during Astro build
-      const pagefindPath = '/pagefind/pagefind.js';
+    // @ts-ignore
+    if (window.pagefind) {
       // @ts-ignore
-      const mod = await import(pagefindPath);
-      pagefind = mod;
+      pagefind = window.pagefind;
       await pagefind.init();
       return true;
-    } catch {
-      return false;
     }
+    return false;
   }
 
   function openModal() {
