@@ -6,7 +6,7 @@ import rehypeSlug from 'rehype-slug';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 
 export default defineConfig({
-  site: 'https://your-course-site.vercel.app',
+  site: 'https://jame-louis.github.io/course-template-astro/',
   output: 'static',
   integrations: [mdx(), sitemap()],
   vite: {
