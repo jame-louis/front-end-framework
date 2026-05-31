@@ -1,0 +1,66 @@
+---
+import CourseLayout from '../../layouts/CourseLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const assignments = await getCollection('assignments');
+  return assignments
+    .filter(a => !a.data.draft)
+    .map(assignment => ({
+      params: { slug: assignment.id },
+      props: { assignment },
+    }));
+}
+
+const { assignment } = Astro.props;
+const { Content } = await render(assignment);
+---
+
+<CourseLayout title={assignment.data.title}>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-6">
+      <a href="/assignments" class="text-sm text-text-muted hover:text-primary">
+        ← 返回作业列表
+      </a>
+    </div>
+
+    <article>
+      <header class="mb-8 pb-6 border-b border-border">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-10 h-10 bg-primary text-white rounded-md flex items-center justify-center font-semibold">
+            {assignment.data.assignmentNumber}
+          </span>
+          <h1 class="text-3xl font-bold">{assignment.data.title}</h1>
+        </div>
+
+        <div class="flex flex-wrap gap-4 text-sm text-text-muted">
+          {assignment.data.dueDate && (
+            <span>📅 截止日期: {assignment.data.dueDate.toLocaleDateString('zh-CN')}</span>
+          )}
+          <span>⏱️ 预计耗时: {assignment.data.estimatedHours}小时</span>
+          <span>📝 分值: {assignment.data.points}分</span>
+          <span>📤 提交格式: {assignment.data.submissionFormat}</span>
+        </div>
+
+        {assignment.data.downloadFile && (
+          <div class="mt-4">
+            <a
+              href={assignment.data.downloadFile}
+              download
+              class="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              下载作业文件
+            </a>
+          </div>
+        )}
+      </header>
+
+      <div class="prose-custom">
+        <Content />
+      </div>
+    </article>
+  </div>
+</CourseLayout>

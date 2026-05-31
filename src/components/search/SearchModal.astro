@@ -1,0 +1,208 @@
+<div id="search-modal" class="fixed inset-0 z-50 hidden" aria-modal="true" role="dialog">
+  <!-- Overlay -->
+  <div id="search-overlay" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+
+  <!-- Modal Content -->
+  <div class="absolute inset-x-4 top-[10%] sm:top-[15%] sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-full sm:max-w-2xl">
+    <div class="bg-white rounded-xl shadow-2xl overflow-hidden border border-border">
+      <!-- Search Input -->
+      <div class="flex items-center gap-3 px-4 py-3 border-b border-border">
+        <svg class="w-5 h-5 text-text-muted flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input
+          id="search-input"
+          type="text"
+          placeholder="搜索课程内容..."
+          class="flex-1 bg-transparent outline-none text-text placeholder:text-text-muted"
+          autocomplete="off"
+        />
+        <kbd class="hidden sm:inline-flex items-center gap-1 px-2 py-1 bg-bg-secondary rounded text-xs text-text-muted border border-border">
+          <span>Esc</span>
+        </kbd>
+      </div>
+
+      <!-- Results -->
+      <div id="search-results" class="max-h-[60vh] overflow-y-auto p-2">
+        <div id="search-empty" class="p-8 text-center text-text-muted text-sm">
+          输入关键词开始搜索...
+        </div>
+        <div id="search-loading" class="hidden p-8 text-center text-text-muted text-sm">
+          搜索中...
+        </div>
+        <div id="search-no-results" class="hidden p-8 text-center text-text-muted text-sm">
+          未找到相关结果
+        </div>
+        <div id="search-error" class="hidden p-8 text-center text-red-600 text-sm">
+          搜索服务暂不可用，请先运行构建命令
+        </div>
+        <div id="search-list" class="hidden space-y-1"></div>
+      </div>
+
+      <!-- Footer -->
+      <div class="px-4 py-2 bg-bg-secondary border-t border-border text-xs text-text-muted flex items-center justify-between">
+        <span>按 Enter 打开结果</span>
+        <span class="flex items-center gap-2">
+          <span class="flex items-center gap-1">
+            <kbd class="px-1.5 py-0.5 bg-white rounded border border-border">↑</kbd>
+            <kbd class="px-1.5 py-0.5 bg-white rounded border border-border">↓</kbd>
+            导航
+          </span>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let pagefind: any = null;
+  let selectedIndex = -1;
+
+  const modal = document.getElementById('search-modal');
+  const overlay = document.getElementById('search-overlay');
+  const input = document.getElementById('search-input') as HTMLInputElement;
+  const emptyState = document.getElementById('search-empty');
+  const loadingState = document.getElementById('search-loading');
+  const noResultsState = document.getElementById('search-no-results');
+  const errorState = document.getElementById('search-error');
+  const list = document.getElementById('search-list');
+
+  async function initPagefind() {
+    if (pagefind) return true;
+    try {
+      // @ts-ignore
+      const mod = await import(/* @vite-ignore */ '/pagefind/pagefind.js');
+      pagefind = mod;
+      await pagefind.init();
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function openModal() {
+    modal?.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => input?.focus(), 50);
+    initPagefind();
+  }
+
+  function closeModal() {
+    modal?.classList.add('hidden');
+    document.body.style.overflow = '';
+    if (input) input.value = '';
+    resetResults();
+  }
+
+  function resetResults() {
+    selectedIndex = -1;
+    emptyState?.classList.remove('hidden');
+    loadingState?.classList.add('hidden');
+    noResultsState?.classList.add('hidden');
+    errorState?.classList.add('hidden');
+    list?.classList.add('hidden');
+    if (list) list.innerHTML = '';
+  }
+
+  function showState(state: 'empty' | 'loading' | 'no-results' | 'error' | 'list') {
+    emptyState?.classList.toggle('hidden', state !== 'empty');
+    loadingState?.classList.toggle('hidden', state !== 'loading');
+    noResultsState?.classList.toggle('hidden', state !== 'no-results');
+    errorState?.classList.toggle('hidden', state !== 'error');
+    list?.classList.toggle('hidden', state !== 'list');
+  }
+
+  function renderResults(results: any[]) {
+    if (!list) return;
+    list.innerHTML = '';
+
+    results.forEach((result, i) => {
+      const el = document.createElement('a');
+      el.href = result.url;
+      el.className = `block px-3 py-2.5 rounded-lg transition-colors ${
+        i === selectedIndex ? 'bg-bg-secondary' : 'hover:bg-bg-secondary'
+      }`;
+      el.innerHTML = `
+        <div class="font-medium text-sm text-text line-clamp-1">${result.meta.title || '无标题'}</div>
+        <div class="text-xs text-text-muted mt-0.5 line-clamp-2">${result.excerpt || ''}</div>
+      `;
+      el.addEventListener('click', closeModal);
+      list.appendChild(el);
+    });
+
+    showState('list');
+  }
+
+  async function performSearch(query: string) {
+    if (!query.trim()) {
+      resetResults();
+      return;
+    }
+
+    showState('loading');
+    const ok = await initPagefind();
+    if (!ok) {
+      showState('error');
+      return;
+    }
+
+    const search = await pagefind.search(query);
+    const results = await Promise.all(search.results.slice(0, 10).map((r: any) => r.data()));
+
+    if (results.length === 0) {
+      showState('no-results');
+    } else {
+      selectedIndex = 0;
+      renderResults(results);
+    }
+  }
+
+  // Debounced search
+  let debounceTimer: ReturnType<typeof setTimeout>;
+  input?.addEventListener('input', (e) => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => performSearch((e.target as HTMLInputElement).value), 150);
+  });
+
+  // Keyboard navigation
+  input?.addEventListener('keydown', (e) => {
+    const items = list?.querySelectorAll('a');
+    if (!items || items.length === 0) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+      renderResults(Array.from(items).map(a => ({
+        url: a.href,
+        meta: { title: a.querySelector('.font-medium')?.textContent },
+        excerpt: a.querySelector('.text-xs')?.textContent
+      })));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      selectedIndex = Math.max(selectedIndex - 1, 0);
+      renderResults(Array.from(items).map(a => ({
+        url: a.href,
+        meta: { title: a.querySelector('.font-medium')?.textContent },
+        excerpt: a.querySelector('.text-xs')?.textContent
+      })));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (selectedIndex >= 0 && items[selectedIndex]) {
+        items[selectedIndex].click();
+      }
+    }
+  });
+
+  // Close handlers
+  overlay?.addEventListener('click', closeModal);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      openModal();
+    }
+  });
+
+  // Expose open function globally
+  (window as any).openSearchModal = openModal;
+</script>

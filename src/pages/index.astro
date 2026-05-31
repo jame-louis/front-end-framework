@@ -1,0 +1,142 @@
+---
+import CourseLayout from '../layouts/CourseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const lectures = await getCollection('lectures');
+const sortedLectures = lectures
+  .filter(l => !l.data.draft)
+  .sort((a, b) => a.data.lectureNumber - b.data.lectureNumber);
+
+const assignments = await getCollection('assignments');
+const assignmentsCount = assignments.filter(a => !a.data.draft).length;
+
+const modules = [
+  { name: '基础入门', count: 2, icon: '01', color: 'bg-blue-500' },
+  { name: '核心概念', count: 1, icon: '02', color: 'bg-green-500' },
+];
+
+const courseInfo = {
+  title: '课程名称',
+  description: '在这里填写课程的简要描述，介绍课程目标、适用人群和学习成果。',
+};
+---
+
+<CourseLayout title="首页">
+  <!-- Hero Section -->
+  <section class="bg-gradient-to-b from-bg-secondary to-white py-16 lg:py-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-4xl lg:text-5xl font-bold text-text mb-6">
+        {courseInfo.title}
+      </h1>
+      <p class="text-lg lg:text-xl text-text-muted max-w-2xl mx-auto mb-8">
+        {courseInfo.description}
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a
+          href="/lectures"
+          class="inline-flex items-center justify-center px-6 py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary-dark transition-colors"
+        >
+          开始学习
+        </a>
+        <a
+          href="/syllabus"
+          class="inline-flex items-center justify-center px-6 py-3 bg-white text-text font-medium rounded-lg border border-border hover:bg-bg-secondary transition-colors"
+        >
+          查看大纲
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="py-12 border-b border-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="text-center p-6 bg-bg-secondary rounded-lg">
+          <div class="text-3xl font-bold text-primary">{sortedLectures.length}</div>
+          <div class="text-text-muted mt-1">讲课程</div>
+        </div>
+        <div class="text-center p-6 bg-bg-secondary rounded-lg">
+          <div class="text-3xl font-bold text-primary">{modules.length}</div>
+          <div class="text-text-muted mt-1">大模块</div>
+        </div>
+        <div class="text-center p-6 bg-bg-secondary rounded-lg">
+          <div class="text-3xl font-bold text-primary">{assignmentsCount}</div>
+          <div class="text-text-muted mt-1">个作业</div>
+        </div>
+        <div class="text-center p-6 bg-bg-secondary rounded-lg">
+          <div class="text-3xl font-bold text-primary">90</div>
+          <div class="text-text-muted mt-1">分钟/讲</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modules Section -->
+  <section class="py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-2xl font-bold text-center mb-12">课程内容</h2>
+      <div class="grid md:grid-cols-3 gap-6">
+        {modules.map((module) => (
+          <div class="bg-white border border-border rounded-lg p-6 hover:shadow-md transition-shadow">
+            <div class={`inline-flex items-center justify-center w-12 h-12 rounded-lg ${module.color} text-white font-bold mb-4`}>
+              {module.icon}
+            </div>
+            <h3 class="text-lg font-semibold mb-2">{module.name}</h3>
+            <p class="text-text-muted text-sm">
+              包含 {module.count} 讲课程
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent Lectures -->
+  <section class="py-16 bg-bg-secondary">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center mb-8">
+        <h2 class="text-2xl font-bold">课程列表</h2>
+        <a href="/lectures" class="text-primary hover:text-primary-dark font-medium">
+          查看全部 →
+        </a>
+      </div>
+      <div class="grid gap-4">
+        {sortedLectures.slice(0, 6).map(lecture => (
+          <a
+            href={`/lectures/${lecture.id.replace('.md', '')}`}
+            class="flex items-center gap-4 p-4 bg-white rounded-lg border border-border hover:border-primary hover:shadow-sm transition-all"
+          >
+            <span class="flex-shrink-0 w-10 h-10 bg-primary text-white rounded-md flex items-center justify-center font-semibold">
+              {lecture.data.lectureNumber}
+            </span>
+            <span class="font-medium">{lecture.data.title}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Course Info -->
+  <section class="py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-bg-secondary rounded-lg p-8">
+        <h2 class="text-xl font-bold mb-6">课程信息</h2>
+        <div class="grid md:grid-cols-3 gap-6 text-sm">
+          <div>
+            <h4 class="font-semibold text-text-muted mb-2">教材</h4>
+            <p>《示例教材》(出版社)</p>
+          </div>
+          <div>
+            <h4 class="font-semibold text-text-muted mb-2">先修课程</h4>
+            <p>计算机基础、程序设计入门</p>
+          </div>
+          <div>
+            <h4 class="font-semibold text-text-muted mb-2">考核方式</h4>
+            <p>出勤(10%) + 平时(30%) + 期末(60%)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</CourseLayout>

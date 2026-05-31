@@ -1,0 +1,215 @@
+---
+import DocLayout from '../../layouts/DocLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const lectures = await getCollection('lectures');
+  return lectures
+    .filter(l => !l.data.draft)
+    .map(lecture => ({
+      params: { slug: lecture.id.replace('.md', '') },
+      props: { lecture },
+    }));
+}
+
+const { lecture } = Astro.props;
+const { Content, headings } = await render(lecture);
+
+const allLectures = await getCollection('lectures');
+const sorted = allLectures
+  .filter(l => !l.data.draft)
+  .sort((a, b) => a.data.lectureNumber - b.data.lectureNumber);
+
+const currentIndex = sorted.findIndex(l => l.data.lectureNumber === lecture.data.lectureNumber);
+const prev = sorted[currentIndex - 1];
+const next = sorted[currentIndex + 1];
+
+const slidevUrl = lecture.data.slidevUrl;
+const slug = lecture.id.replace('.md', '');
+
+const difficultyLabels: Record<string, string> = {
+  beginner: '初级',
+  intermediate: '中级',
+  advanced: '高级',
+};
+
+const difficultyColors: Record<string, string> = {
+  beginner: 'bg-green-100 text-green-700 border-green-200',
+  intermediate: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+  advanced: 'bg-red-100 text-red-700 border-red-200',
+};
+---
+
+<DocLayout
+  title={lecture.data.title}
+  currentSlug={slug}
+  headings={headings}
+>
+  <!-- Mobile: Back button -->
+  <div class="mb-4 sm:mb-6">
+    <a href="/lectures" class="inline-flex items-center gap-1 text-sm text-text-muted hover:text-primary transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+      返回课程列表
+    </a>
+  </div>
+
+  <article>
+    <!-- Header -->
+    <header class="mb-6 sm:mb-8 pb-4 sm:pb-6 border-b border-border">
+      <!-- Mobile: Compact title -->
+      <div class="flex items-start gap-3 sm:gap-4 mb-3">
+        <span class="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-primary text-white rounded-lg flex items-center justify-center font-bold text-lg sm:text-xl">
+          {lecture.data.lectureNumber}
+        </span>
+        <div class="flex-1 min-w-0">
+          <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold leading-tight">{lecture.data.title}</h1>
+        </div>
+      </div>
+
+      <!-- Metadata -->
+      <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm">
+        {lecture.data.module && (
+          <span class="px-2 py-1 bg-bg-secondary rounded-md text-text-muted">
+            {lecture.data.module}
+          </span>
+        )}
+        {lecture.data.duration && (
+          <span class="px-2 py-1 bg-bg-secondary rounded-md text-text-muted flex items-center gap-1">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            {lecture.data.duration}
+          </span>
+        )}
+        <span class={`px-2 py-1 rounded-md border text-xs font-medium ${difficultyColors[lecture.data.difficulty]}`}>
+          {difficultyLabels[lecture.data.difficulty]}
+        </span>
+        {lecture.data.hasSlides && (
+          <span class="px-2 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-md text-xs font-medium">
+            有课件
+          </span>
+        )}
+      </div>
+    </header>
+
+    <!-- Slidev Banner -->
+    {slidevUrl && (
+      <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-3 sm:p-4 mb-6 sm:mb-8">
+        <div class="flex items-start sm:items-center gap-3">
+          <span class="text-xl sm:text-2xl flex-shrink-0">📊</span>
+          <p class="text-blue-800 text-sm sm:text-base m-0 flex-1">
+            本课程有配套 Slidev 演示文稿
+          </p>
+          <a
+            href={slidevUrl}
+            target="_blank"
+            class="flex-shrink-0 text-sm font-medium text-blue-600 hover:text-blue-800 whitespace-nowrap"
+          >
+            查看 →
+          </a>
+        </div>
+      </div>
+    )}
+
+    <!-- Mark Complete Button -->
+    <div class="mb-6 sm:mb-8">
+      <button
+        id="mark-complete-btn"
+        data-slug={slug}
+        class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-green-500 text-green-600 font-medium hover:bg-green-50 transition-colors"
+      >
+        <svg id="complete-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <span id="complete-text">标记为已完成</span>
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div class="prose-custom">
+      <Content />
+    </div>
+  </article>
+
+  <!-- Prev/Next Navigation -->
+  <nav class="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-border">
+    <div class="grid grid-cols-2 gap-3 sm:gap-4">
+      {prev ? (
+        <a
+          href={`/lectures/${prev.id.replace('.md', '')}`}
+          class="group flex flex-col p-3 sm:p-4 bg-bg-secondary rounded-lg border border-border hover:border-primary hover:bg-white transition-all"
+        >
+          <span class="text-xs sm:text-sm text-text-muted flex items-center gap-1 mb-1">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            上一讲
+          </span>
+          <span class="font-medium text-sm sm:text-base line-clamp-2 group-hover:text-primary transition-colors">
+            {prev.data.title}
+          </span>
+        </a>
+      ) : (
+        <div class="p-3 sm:p-4 bg-bg-secondary rounded-lg border border-border opacity-50">
+          <span class="text-xs sm:text-sm text-text-muted">上一讲</span>
+          <span class="block font-medium text-sm sm:text-base text-text-muted">没有了</span>
+        </div>
+      )}
+
+      {next ? (
+        <a
+          href={`/lectures/${next.id.replace('.md', '')}`}
+          class="group flex flex-col items-end text-right p-3 sm:p-4 bg-bg-secondary rounded-lg border border-border hover:border-primary hover:bg-white transition-all"
+        >
+          <span class="text-xs sm:text-sm text-text-muted flex items-center gap-1 mb-1">
+            下一讲
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </span>
+          <span class="font-medium text-sm sm:text-base line-clamp-2 group-hover:text-primary transition-colors">
+            {next.data.title}
+          </span>
+        </a>
+      ) : (
+        <div class="p-3 sm:p-4 bg-bg-secondary rounded-lg border border-border opacity-50 text-right">
+          <span class="text-xs sm:text-sm text-text-muted">下一讲</span>
+          <span class="block font-medium text-sm sm:text-base text-text-muted">没有了</span>
+        </div>
+      )}
+    </div>
+  </nav>
+
+  <script>
+    import { isCompleted, toggleComplete } from '../../lib/progress';
+
+    const btn = document.getElementById('mark-complete-btn');
+    const text = document.getElementById('complete-text');
+    const icon = document.getElementById('complete-icon');
+    const slug = btn?.getAttribute('data-slug');
+
+    function updateState() {
+      if (!slug) return;
+      const completed = isCompleted(slug);
+      if (completed) {
+        text!.textContent = '已完成';
+        btn!.classList.add('bg-green-50');
+        icon!.classList.add('text-green-600');
+      } else {
+        text!.textContent = '标记为已完成';
+        btn!.classList.remove('bg-green-50');
+        icon!.classList.remove('text-green-600');
+      }
+    }
+
+    updateState();
+
+    btn?.addEventListener('click', () => {
+      if (!slug) return;
+      toggleComplete(slug);
+      updateState();
+    });
+  </script>
+</DocLayout>

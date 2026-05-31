@@ -1,0 +1,60 @@
+---
+import CourseLayout from '../layouts/CourseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const materials = await getCollection('materials');
+
+const typeLabels: Record<string, string> = {
+  article: '文章',
+  video: '视频',
+  code: '代码',
+  tool: '工具',
+  book: '书籍',
+};
+
+const typeColors: Record<string, string> = {
+  article: 'bg-green-100 text-green-700',
+  video: 'bg-red-100 text-red-700',
+  code: 'bg-purple-100 text-purple-700',
+  tool: 'bg-orange-100 text-orange-700',
+  book: 'bg-blue-100 text-blue-700',
+};
+---
+
+<CourseLayout title="学习资料">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-bold mb-4">学习资料</h1>
+    <p class="text-text-muted mb-8">
+      推荐的学习资源，帮助你更深入地理解课程内容
+    </p>
+
+    <div class="grid gap-4">
+      {materials.map(material => (
+        <div class="bg-bg-secondary border border-border rounded-lg p-6">
+          <div class="flex items-start justify-between mb-2">
+            <div class="flex items-center gap-3">
+              <span class={`px-2 py-1 rounded text-xs font-medium ${typeColors[material.data.type]}`}>
+                {typeLabels[material.data.type]}
+              </span>
+              {material.data.tags.map(tag => (
+                <span class="text-xs text-text-muted">#{tag}</span>
+              ))}
+            </div>
+          </div>
+
+          <h3 class="text-lg font-semibold mb-2">
+            {material.data.url ? (
+              <a href={material.data.url} target="_blank" class="hover:text-primary">
+                {material.data.title} ↗
+              </a>
+            ) : (
+              material.data.title
+            )}
+          </h3>
+
+          <p class="text-text-muted text-sm">{material.data.description}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</CourseLayout>
