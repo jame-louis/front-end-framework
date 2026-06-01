@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import { sidebarConfig } from '../../config';
 
 interface Props {
   currentSlug?: string;
@@ -12,17 +13,11 @@ const lectures = await getCollection('lectures');
 const sortedLectures = lectures
   .filter(l => !l.data.draft)
   .sort((a, b) => a.data.lectureNumber - b.data.lectureNumber);
-
-const modules = [
-  { name: 'JavaScript基础', range: [1, 6] },
-  { name: 'Bootstrap框架', range: [8, 9] },
-  { name: 'Vue.js框架', range: [10, 15] },
-];
 ---
 
 <div class="bg-bg-secondary rounded-lg border border-border p-4">
   <h3 class="text-sm font-semibold text-text-muted uppercase tracking-wide mb-3">
-    课程导航
+    {sidebarConfig.title}
   </h3>
 
   <nav class="space-y-1">

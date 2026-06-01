@@ -1,6 +1,7 @@
 ---
 import CourseLayout from '../layouts/CourseLayout.astro';
 import { getCollection } from 'astro:content';
+import { difficultyLabels, pageTitles, progressLabels, labels } from '../config';
 
 const base = import.meta.env.BASE_URL || '/';
 const lectures = await getCollection('lectures');
@@ -20,12 +21,6 @@ sortedLectures.forEach(l => {
 
 const moduleEntries = Array.from(moduleMap.entries());
 
-const difficultyLabels: Record<string, string> = {
-  beginner: '初级',
-  intermediate: '中级',
-  advanced: '高级',
-};
-
 const difficultyColors: Record<string, string> = {
   beginner: 'bg-green-100 text-green-700',
   intermediate: 'bg-yellow-100 text-yellow-700',
@@ -33,11 +28,11 @@ const difficultyColors: Record<string, string> = {
 };
 ---
 
-<CourseLayout title="课程列表">
+<CourseLayout title={pageTitles.lectures}>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
-      <h1 class="text-2xl sm:text-3xl font-bold">课程列表</h1>
+      <h1 class="text-2xl sm:text-3xl font-bold">{pageTitles.lectures}</h1>
       <div class="flex items-center gap-3">
         <div class="text-sm text-text-muted">
           共 <span class="font-semibold text-text">{sortedLectures.length}</span> 讲课程
@@ -49,7 +44,7 @@ const difficultyColors: Record<string, string> = {
     <!-- Progress Bar -->
     <div class="mb-6 sm:mb-8">
       <div class="flex justify-between text-sm mb-2">
-        <span class="text-text-muted">学习进度</span>
+        <span class="text-text-muted">{progressLabels.label}</span>
         <span id="progress-text" class="text-text-muted">0%</span>
       </div>
       <div class="w-full bg-bg-secondary rounded-full h-2.5 border border-border">
@@ -135,7 +130,7 @@ const difficultyColors: Record<string, string> = {
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
-        返回首页
+        {labels.back}首页
       </a>
     </div>
   </div>

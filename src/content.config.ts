@@ -1,4 +1,5 @@
 import { defineCollection, z } from 'astro:content';
+import { courseModules, contentDefaults } from './config/course';
 
 const lectures = defineCollection({
   type: 'content',
@@ -6,9 +7,9 @@ const lectures = defineCollection({
     title: z.string(),
     lectureNumber: z.number(),
     week: z.number().optional(),
-    module: z.enum(['基础入门', '核心概念', 'JavaScript基础', 'Bootstrap框架', 'Vue.js框架', '其他']),
+    module: z.enum(courseModules.names),
     description: z.string(),
-    duration: z.string().default('90分钟'),
+    duration: z.string().default(contentDefaults.duration),
     difficulty: z.enum(['beginner', 'intermediate', 'advanced']).default('beginner'),
     prerequisites: z.array(z.string()).default([]),
     tags: z.array(z.string()).default([]),
@@ -30,7 +31,7 @@ const assignments = defineCollection({
     dueDate: z.date().optional(),
     difficulty: z.enum(['easy', 'medium', 'hard']).default('medium'),
     estimatedHours: z.number().default(2),
-    submissionFormat: z.string().default('学号-HWxx.zip'),
+    submissionFormat: z.string().default(contentDefaults.submissionFormat),
     points: z.number().default(100),
     downloadFile: z.string().optional(),
     draft: z.boolean().default(false),

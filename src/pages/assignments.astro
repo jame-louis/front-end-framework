@@ -1,6 +1,7 @@
 ---
 import CourseLayout from '../layouts/CourseLayout.astro';
 import { getCollection } from 'astro:content';
+import { assignmentLabels, labels, pageTitles } from '../config';
 
 const base = import.meta.env.BASE_URL || '/';
 const assignments = await getCollection('assignments');
@@ -9,12 +10,11 @@ const sortedAssignments = assignments
   .sort((a, b) => a.data.assignmentNumber - b.data.assignmentNumber);
 ---
 
-<CourseLayout title="作业">
+<CourseLayout title={pageTitles.assignments}>
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <h1 class="text-3xl font-bold mb-2">课程作业</h1>
+    <h1 class="text-3xl font-bold mb-2">{assignmentLabels.pageTitle}</h1>
     <p class="text-text-muted mb-8">
-      作业提交格式：<code class="bg-bg-secondary px-2 py-1 rounded">学号-HWxx.zip</code>
-      （例如：<code class="bg-bg-secondary px-2 py-1 rounded">No20001-HW02.zip</code>）
+      {assignmentLabels.submissionFormat}
     </p>
 
     <div class="space-y-6">
@@ -29,17 +29,17 @@ const sortedAssignments = assignments
               <div class="flex flex-wrap gap-4 text-sm text-text-muted mb-4">
                 {hw.data.dueDate && (
                   <span>
-                    📅 截止日期: {hw.data.dueDate.toLocaleDateString('zh-CN')}
+                    {assignmentLabels.deadline} {hw.data.dueDate.toLocaleDateString('zh-CN')}
                   </span>
                 )}
-                <span>⏱️ 预计耗时: {hw.data.estimatedHours}小时</span>
-                <span>📝 分值: {hw.data.points}分</span>
+                <span>{assignmentLabels.estimatedTime} {hw.data.estimatedHours}小时</span>
+                <span>{assignmentLabels.points} {hw.data.points}分</span>
               </div>
               <a
                 href={`${base}assignments/${hw.id}`}
                 class="inline-flex items-center text-primary hover:text-primary-dark font-medium"
               >
-                查看作业详情 →
+                {labels.viewDetails}
               </a>
             </div>
           </div>
@@ -53,13 +53,12 @@ const sortedAssignments = assignments
         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
           <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
         </svg>
-        作业要求
+        {assignmentLabels.requirementsTitle}
       </h3>
       <ul class="text-amber-700 space-y-2 text-sm">
-        <li>请按格式命名压缩包：<code class="bg-amber-100 px-1 rounded">学号-HWxx.zip</code></li>
-        <li>代码文件需包含必要的注释</li>
-        <li>作业需独立完成作业，禁止抄袭</li>
-        <li>逾期提交按考核规定扣分</li>
+        {assignmentLabels.requirements.map(req => (
+          <li>{req}</li>
+        ))}
       </ul>
     </div>
   </div>

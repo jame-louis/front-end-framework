@@ -1,6 +1,7 @@
 ---
 import CourseLayout from '../layouts/CourseLayout.astro';
 import { getCollection } from 'astro:content';
+import { projectLabels, labels, pageTitles } from '../config';
 
 const base = import.meta.env.BASE_URL || '/';
 const projects = await getCollection('projects');
@@ -9,11 +10,11 @@ const sortedProjects = projects
   .sort((a, b) => a.data.projectNumber - b.data.projectNumber);
 ---
 
-<CourseLayout title="项目">
+<CourseLayout title={pageTitles.projects}>
   <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <h1 class="text-3xl font-bold mb-4">课程项目</h1>
+    <h1 class="text-3xl font-bold mb-4">{projectLabels.pageTitle}</h1>
     <p class="text-text-muted mb-8">
-      综合项目练习，应用所学知识完成实际开发任务
+      {projectLabels.description}
     </p>
 
     <div class="space-y-6">
@@ -22,12 +23,12 @@ const sortedProjects = projects
           <div class="flex items-start justify-between mb-4">
             <div>
               <span class="text-sm text-primary font-medium">
-                项目 {project.data.projectNumber}
+                {projectLabels.projectLabel} {project.data.projectNumber}
               </span>
               <h2 class="text-xl font-semibold mt-1">{project.data.title}</h2>
             </div>
             <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
-              {project.data.totalPoints}分
+              {project.data.totalPoints}{projectLabels.pointsSuffix}
             </span>
           </div>
 
@@ -35,7 +36,7 @@ const sortedProjects = projects
 
           {project.data.milestones.length > 0 && (
             <div class="mb-4">
-              <h3 class="font-medium mb-2">里程碑</h3>
+              <h3 class="font-medium mb-2">{projectLabels.milestonesTitle}</h3>
               <ul class="space-y-2">
                 {project.data.milestones.map((milestone, i) => (
                   <li class="flex items-start gap-2 text-sm">
@@ -54,7 +55,7 @@ const sortedProjects = projects
             href={`${base}projects/${project.id}`}
             class="inline-flex items-center text-primary hover:text-primary-dark font-medium"
           >
-            查看详情 →
+            {labels.viewDetails}
           </a>
         </div>
       ))}

@@ -1,6 +1,7 @@
 ---
 import DocLayout from '../../layouts/DocLayout.astro';
 import { getCollection, render } from 'astro:content';
+import { difficultyLabels, labels, lectureLabels } from '../../config';
 
 export async function getStaticPaths() {
   const lectures = await getCollection('lectures');
@@ -28,12 +29,6 @@ const slidevUrl = lecture.data.slidevUrl;
 const slug = lecture.id.replace('.md', '');
 const base = import.meta.env.BASE_URL || '/';
 
-const difficultyLabels: Record<string, string> = {
-  beginner: '初级',
-  intermediate: '中级',
-  advanced: '高级',
-};
-
 const difficultyColors: Record<string, string> = {
   beginner: 'bg-green-100 text-green-700 border-green-200',
   intermediate: 'bg-yellow-100 text-yellow-700 border-yellow-200',
@@ -52,7 +47,7 @@ const difficultyColors: Record<string, string> = {
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
       </svg>
-      返回课程列表
+      {labels.back}课程列表
     </a>
   </div>
 
@@ -89,7 +84,7 @@ const difficultyColors: Record<string, string> = {
         </span>
         {lecture.data.hasSlides && (
           <span class="px-2 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-md text-xs font-medium">
-            有课件
+            {lectureLabels.hasSlidesBadge}
           </span>
         )}
       </div>
@@ -101,14 +96,14 @@ const difficultyColors: Record<string, string> = {
         <div class="flex items-start sm:items-center gap-3">
           <span class="text-xl sm:text-2xl flex-shrink-0">📊</span>
           <p class="text-blue-800 text-sm sm:text-base m-0 flex-1">
-            本课程有配套 Slidev 演示文稿
+            {lectureLabels.slidevBanner}
           </p>
           <a
             href={slidevUrl}
             target="_blank"
             class="flex-shrink-0 text-sm font-medium text-blue-600 hover:text-blue-800 whitespace-nowrap"
           >
-            查看 →
+            {labels.viewLecture}
           </a>
         </div>
       </div>
@@ -124,7 +119,7 @@ const difficultyColors: Record<string, string> = {
         <svg id="complete-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
         </svg>
-        <span id="complete-text">标记为已完成</span>
+        <span id="complete-text">{labels.markComplete}</span>
       </button>
     </div>
 
@@ -146,7 +141,7 @@ const difficultyColors: Record<string, string> = {
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
-            上一讲
+            {labels.previous}
           </span>
           <span class="font-medium text-sm sm:text-base line-clamp-2 group-hover:text-primary transition-colors">
             {prev.data.title}
@@ -154,8 +149,8 @@ const difficultyColors: Record<string, string> = {
         </a>
       ) : (
         <div class="p-3 sm:p-4 bg-bg-secondary rounded-lg border border-border opacity-50">
-          <span class="text-xs sm:text-sm text-text-muted">上一讲</span>
-          <span class="block font-medium text-sm sm:text-base text-text-muted">没有了</span>
+          <span class="text-xs sm:text-sm text-text-muted">{labels.previous}</span>
+          <span class="block font-medium text-sm sm:text-base text-text-muted">{labels.none}</span>
         </div>
       )}
 
@@ -165,7 +160,7 @@ const difficultyColors: Record<string, string> = {
           class="group flex flex-col items-end text-right p-3 sm:p-4 bg-bg-secondary rounded-lg border border-border hover:border-primary hover:bg-white transition-all"
         >
           <span class="text-xs sm:text-sm text-text-muted flex items-center gap-1 mb-1">
-            下一讲
+            {labels.next}
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
@@ -176,8 +171,8 @@ const difficultyColors: Record<string, string> = {
         </a>
       ) : (
         <div class="p-3 sm:p-4 bg-bg-secondary rounded-lg border border-border opacity-50 text-right">
-          <span class="text-xs sm:text-sm text-text-muted">下一讲</span>
-          <span class="block font-medium text-sm sm:text-base text-text-muted">没有了</span>
+          <span class="text-xs sm:text-sm text-text-muted">{labels.next}</span>
+          <span class="block font-medium text-sm sm:text-base text-text-muted">{labels.none}</span>
         </div>
       )}
     </div>
@@ -191,15 +186,20 @@ const difficultyColors: Record<string, string> = {
     const icon = document.getElementById('complete-icon');
     const slug = btn?.getAttribute('data-slug');
 
+    const labels = {
+      completed: '已完成',
+      markComplete: '标记为已完成'
+    };
+
     function updateState() {
       if (!slug) return;
       const completed = isCompleted(slug);
       if (completed) {
-        text!.textContent = '已完成';
+        text!.textContent = labels.completed;
         btn!.classList.add('bg-green-50');
         icon!.classList.add('text-green-600');
       } else {
-        text!.textContent = '标记为已完成';
+        text!.textContent = labels.markComplete;
         btn!.classList.remove('bg-green-50');
         icon!.classList.remove('text-green-600');
       }

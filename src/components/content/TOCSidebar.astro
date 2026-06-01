@@ -1,4 +1,6 @@
 ---
+import { tocConfig } from '../../config';
+
 interface Props {
   headings: Array<{ depth: number; slug: string; text: string }>;
 }
@@ -7,7 +9,7 @@ const { headings } = Astro.props;
 ---
 
 <div class="text-sm" id="toc-sidebar">
-  <p class="font-medium text-text-muted mb-2">本页目录</p>
+  <p class="font-medium text-text-muted mb-2">{tocConfig.title}</p>
   <nav class="space-y-1 border-l border-border" id="toc-nav">
     {headings
       .filter(h => h.depth <= 3)

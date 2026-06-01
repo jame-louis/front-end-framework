@@ -1,14 +1,11 @@
 ---
+import { site, mainNavItems, searchConfig } from '../../config';
+
 const base = import.meta.env.BASE_URL || '/';
-const navItems = [
-  { href: base, label: '首页' },
-  { href: `${base}syllabus`, label: '课程大纲' },
-  { href: `${base}schedule`, label: '课程表' },
-  { href: `${base}lectures`, label: '课程' },
-  { href: `${base}assignments`, label: '作业' },
-  { href: `${base}projects`, label: '项目' },
-  { href: `${base}materials`, label: '资料' },
-];
+const navItems = mainNavItems.map(item => ({
+  ...item,
+  href: item.href === '/' ? base : `${base}${item.href.replace(/^\//, '')}`
+}));
 
 const currentPath = Astro.url.pathname;
 ---
@@ -18,7 +15,7 @@ const currentPath = Astro.url.pathname;
     <div class="flex justify-between items-center h-16">
       <!-- Logo -->
       <a href={base} class="text-xl font-semibold text-text hover:text-primary transition-colors">
-        课程网站
+        {site.title}
       </a>
 
       <!-- Desktop Nav -->
@@ -43,14 +40,14 @@ const currentPath = Astro.url.pathname;
         <button
           id="search-trigger"
           class="flex items-center gap-2 px-3 py-1.5 text-sm text-text-muted bg-bg-secondary rounded-lg hover:bg-border transition-colors"
-          aria-label="搜索"
+          aria-label={searchConfig.ariaLabel}
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
-          <span class="hidden lg:inline">搜索</span>
+          <span class="hidden lg:inline">{searchConfig.buttonLabel}</span>
           <kbd class="hidden lg:inline-flex items-center px-1.5 py-0.5 bg-white rounded text-xs text-text-muted border border-border">
-            <span>Ctrl K</span>
+            <span>{searchConfig.keyboardShortcut}</span>
           </kbd>
         </button>
       </div>
@@ -60,7 +57,7 @@ const currentPath = Astro.url.pathname;
         <button
           id="search-trigger-mobile"
           class="p-2 text-text-muted hover:text-primary"
-          aria-label="搜索"
+          aria-label={searchConfig.ariaLabel}
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -70,7 +67,7 @@ const currentPath = Astro.url.pathname;
         <button
           id="mobile-menu-btn"
           class="p-2 text-text-muted hover:text-primary"
-          aria-label="打开菜单"
+          aria-label={searchConfig.mobileMenuLabel}
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />

@@ -1,6 +1,7 @@
 ---
 import CourseLayout from '../../layouts/CourseLayout.astro';
 import { getCollection, render } from 'astro:content';
+import { projectLabels, labels } from '../../config';
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects');
@@ -20,7 +21,7 @@ const { Content } = await render(project);
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="mb-6">
       <a href={`${import.meta.env.BASE_URL}projects`} class="text-sm text-text-muted hover:text-primary">
-        ← 返回项目列表
+        {labels.back}{pageTitles.projects}
       </a>
     </div>
 
@@ -29,12 +30,12 @@ const { Content } = await render(project);
         <div class="flex items-start justify-between gap-4">
           <div>
             <span class="text-sm text-primary font-medium">
-              项目 {project.data.projectNumber}
+              {projectLabels.projectLabel} {project.data.projectNumber}
             </span>
             <h1 class="text-3xl font-bold mt-2">{project.data.title}</h1>
           </div>
           <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
-            {project.data.totalPoints}分
+            {project.data.totalPoints}{projectLabels.pointsSuffix}
           </span>
         </div>
 
@@ -43,7 +44,7 @@ const { Content } = await render(project);
 
       {project.data.milestones.length > 0 && (
         <div class="mb-8 bg-bg-secondary rounded-lg p-6">
-          <h2 class="text-lg font-semibold mb-4">项目里程碑</h2>
+          <h2 class="text-lg font-semibold mb-4">{projectLabels.milestonesTitle}</h2>
           <div class="space-y-4">
             {project.data.milestones.map((milestone, i) => (
               <div class="flex gap-4">
@@ -55,7 +56,7 @@ const { Content } = await render(project);
                   <p class="text-sm text-text-muted mt-1">{milestone.description}</p>
                   {milestone.dueDate && (
                     <span class="text-sm text-text-muted mt-1 block">
-                      截止日期: {milestone.dueDate.toLocaleDateString('zh-CN')}
+                      {projectLabels.deadlineLabel} {milestone.dueDate.toLocaleDateString('zh-CN')}
                     </span>
                   )}
                 </div>

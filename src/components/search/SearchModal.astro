@@ -1,3 +1,7 @@
+---
+import { searchConfig, categoryLabels, searchLabels } from '../../config';
+---
+
 <div id="search-modal" class="fixed inset-0 z-50 hidden" aria-modal="true" role="dialog">
   <!-- Overlay -->
   <div id="search-overlay" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
@@ -13,28 +17,28 @@
         <input
           id="search-input"
           type="text"
-          placeholder="搜索课程内容..."
+          placeholder={searchConfig.placeholder}
           class="flex-1 bg-transparent outline-none text-text placeholder:text-text-muted"
           autocomplete="off"
         />
         <kbd class="hidden sm:inline-flex items-center gap-1 px-2 py-1 bg-bg-secondary rounded text-xs text-text-muted border border-border">
-          <span>Esc</span>
+          <span>{searchConfig.escapeKey}</span>
         </kbd>
       </div>
 
       <!-- Results -->
       <div id="search-results" class="max-h-[60vh] overflow-y-auto p-2">
         <div id="search-empty" class="p-8 text-center text-text-muted text-sm">
-          输入关键词开始搜索...
+          {searchConfig.emptyState}
         </div>
         <div id="search-loading" class="hidden p-8 text-center text-text-muted text-sm">
-          搜索中...
+          {searchConfig.loadingState}
         </div>
         <div id="search-no-results" class="hidden p-8 text-center text-text-muted text-sm">
-          未找到相关结果
+          {searchConfig.noResults}
         </div>
         <div id="search-error" class="hidden p-8 text-center text-red-600 text-sm">
-          搜索服务暂不可用，请先运行构建命令
+          {searchConfig.errorMessage}
         </div>
         <div id="search-list" class="hidden space-y-1"></div>
       </div>
@@ -57,12 +61,12 @@
 
       <!-- Footer -->
       <div class="px-4 py-2 bg-bg-secondary border-t border-border text-xs text-text-muted flex items-center justify-between">
-        <span>按 Enter 打开结果</span>
+        <span>{searchConfig.enterToOpen}</span>
         <span class="flex items-center gap-2">
           <span class="flex items-center gap-1">
             <kbd class="px-1.5 py-0.5 bg-white rounded border border-border">↑</kbd>
             <kbd class="px-1.5 py-0.5 bg-white rounded border border-border">↓</kbd>
-            导航
+            {searchConfig.navigateHint}
           </span>
         </span>
       </div>
@@ -135,12 +139,20 @@
     list?.classList.toggle('hidden', state !== 'list');
   }
 
+  const categoryLabels: Record<string, { label: string; color: string }> = {
+    lectures: { label: '讲义', color: 'bg-blue-100 text-blue-700' },
+    assignments: { label: '作业', color: 'bg-orange-100 text-orange-700' },
+    projects: { label: '项目', color: 'bg-purple-100 text-purple-700' },
+    materials: { label: '资料', color: 'bg-green-100 text-green-700' },
+    pages: { label: '页面', color: 'bg-gray-100 text-gray-700' },
+  };
+
   function getCategoryFromUrl(url: string): { label: string; color: string } {
-    if (url.includes('/lectures/')) return { label: '讲义', color: 'bg-blue-100 text-blue-700' };
-    if (url.includes('/assignments/')) return { label: '作业', color: 'bg-orange-100 text-orange-700' };
-    if (url.includes('/projects/')) return { label: '项目', color: 'bg-purple-100 text-purple-700' };
-    if (url.includes('/materials/')) return { label: '资料', color: 'bg-green-100 text-green-700' };
-    return { label: '页面', color: 'bg-gray-100 text-gray-700' };
+    if (url.includes('/lectures/')) return categoryLabels.lectures;
+    if (url.includes('/assignments/')) return categoryLabels.assignments;
+    if (url.includes('/projects/')) return categoryLabels.projects;
+    if (url.includes('/materials/')) return categoryLabels.materials;
+    return categoryLabels.pages;
   }
 
   function renderResults(results: any[]) {

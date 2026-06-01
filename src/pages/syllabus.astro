@@ -1,6 +1,7 @@
 ---
 import CourseLayout from '../layouts/CourseLayout.astro';
 import { getCollection } from 'astro:content';
+import { sidebarConfig, courseObjectives, syllabusLabels, labels, pageTitles } from '../config';
 
 const base = import.meta.env.BASE_URL || '/';
 const lectures = await getCollection('lectures');
@@ -8,30 +9,22 @@ const sortedLectures = lectures
   .filter(l => !l.data.draft)
   .sort((a, b) => a.data.lectureNumber - b.data.lectureNumber);
 
-const modules = [
-  { name: 'JavaScript基础', range: [1, 6], description: 'JavaScript核心语法、DOM操作、事件处理、数据组织与持久化' },
-  { name: 'Bootstrap框架', range: [8, 9], description: '响应式布局、Bootstrap组件与工具类' },
-  { name: 'Vue.js框架', range: [10, 15], description: 'Vue 3基础、组件开发、路由管理、状态管理' },
-];
-
-const objectives = [
-  '掌握JavaScript核心语法与面向对象编程',
-  '熟练使用DOM操作与事件处理',
-  '掌握Bootstrap响应式框架',
-  '理解Vue.js渐进式框架原理',
-  '具备前端项目开发能力',
-];
+const moduleDescriptions: Record<string, string> = {
+  'JavaScript基础': 'JavaScript核心语法、DOM操作、事件处理、数据组织与持久化',
+  'Bootstrap框架': '响应式布局、Bootstrap组件与工具类',
+  'Vue.js框架': 'Vue 3基础、组件开发、路由管理、状态管理',
+};
 ---
 
-<CourseLayout title="课程大纲">
+<CourseLayout title={pageTitles.syllabus}>
   <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <h1 class="text-3xl font-bold mb-8">课程大纲</h1>
+    <h1 class="text-3xl font-bold mb-8">{pageTitles.syllabus}</h1>
 
     <!-- Course Overview -->
     <section class="mb-12 bg-bg-secondary rounded-lg p-6">
-      <h2 class="text-xl font-semibold mb-4">课程目标</h2>
+      <h2 class="text-xl font-semibold mb-4">{syllabusLabels.objectivesTitle}</h2>
       <ul class="space-y-2">
-        {objectives.map(obj => (
+        {courseObjectives.map(obj => (
           <li class="flex items-start gap-2">
             <span class="text-primary mt-1">✓</span>
             <span>{obj}</span>
@@ -42,14 +35,14 @@ const objectives = [
 
     <!-- Modules -->
     <section class="mb-12">
-      <h2 class="text-xl font-semibold mb-6">模块划分</h2>
+      <h2 class="text-xl font-semibold mb-6">{syllabusLabels.modulesTitle}</h2>
       <div class="grid md:grid-cols-3 gap-6">
-        {modules.map(module => (
+        {sidebarConfig.modules.map(module => (
           <div class="bg-white border border-border rounded-lg p-6">
             <h3 class="font-semibold text-primary mb-2">{module.name}</h3>
-            <p class="text-sm text-text-muted mb-4">{module.description}</p>
+            <p class="text-sm text-text-muted mb-4">{moduleDescriptions[module.name]}</p>
             <div class="text-sm">
-              <span class="font-medium">课程范围:</span> 第{module.range[0]}-{module.range[1]}讲
+              <span class="font-medium">{syllabusLabels.courseRangeLabel}</span> {syllabusLabels.lectureRangeTemplate.replace('{start}', String(module.range[0])).replace('{end}', String(module.range[1]))}
             </div>
           </div>
         ))}
@@ -58,7 +51,7 @@ const objectives = [
 
     <!-- Lecture Schedule -->
     <section>
-      <h2 class="text-xl font-semibold mb-6">详细安排</h2>
+      <h2 class="text-xl font-semibold mb-6">{syllabusLabels.scheduleTitle}</h2>
       <div class="space-y-4">
         {sortedLectures.map(lecture => (
           <div class="flex items-center gap-4 p-4 bg-bg-secondary rounded-lg border border-border">
@@ -76,7 +69,7 @@ const objectives = [
               href={`${base}lectures/${lecture.id.replace('.md', '')}`}
               class="text-sm text-primary hover:text-primary-dark font-medium"
             >
-              查看 →
+              {labels.viewLecture}
             </a>
           </div>
         ))}
