@@ -1,7 +1,7 @@
 ---
 import CourseLayout from '../../layouts/CourseLayout.astro';
 import { getCollection, render } from 'astro:content';
-import { projectLabels, labels } from '../../config';
+import { projectLabels, labels, pageTitles } from '../../config';
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects');
