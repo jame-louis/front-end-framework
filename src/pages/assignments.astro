@@ -2,6 +2,7 @@
 import CourseLayout from '../layouts/CourseLayout.astro';
 import { getCollection } from 'astro:content';
 
+const base = import.meta.env.BASE_URL || '/';
 const assignments = await getCollection('assignments');
 const sortedAssignments = assignments
   .filter(a => !a.data.draft)
@@ -35,7 +36,7 @@ const sortedAssignments = assignments
                 <span>📝 分值: {hw.data.points}分</span>
               </div>
               <a
-                href={`/assignments/${hw.id}`}
+                href={`${base}assignments/${hw.id}`}
                 class="inline-flex items-center text-primary hover:text-primary-dark font-medium"
               >
                 查看作业详情 →
