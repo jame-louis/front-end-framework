@@ -8,6 +8,7 @@ interface Props {
 const { data } = Astro.props;
 const nodesJson = JSON.stringify(data.nodes);
 const linksJson = JSON.stringify(data.links);
+const baseUrl = import.meta.env.BASE_URL;
 ---
 
 <div class="concept-graph-container">
@@ -25,7 +26,7 @@ const linksJson = JSON.stringify(data.links);
       </svg>
     </button>
   </div>
-  <div id="concept-graph" class="concept-graph" data-nodes={nodesJson} data-links={linksJson}></div>
+  <div id="concept-graph" class="concept-graph" data-nodes={nodesJson} data-links={linksJson} data-base={baseUrl}></div>
   <div class="graph-legend">
     <div class="legend-item">
       <span class="legend-dot module-基础入门"></span>
@@ -145,8 +146,9 @@ const linksJson = JSON.stringify(data.links);
     .text((d: any) => `${d.name}\n模块: ${d.module}`);
 
   // Click to navigate
+  const baseUrl = container.dataset.base || '/';
   node.on('click', (event: MouseEvent, d: any) => {
-    window.location.href = `/lectures/${d.id}`;
+    window.location.href = `${baseUrl}lectures/${d.id}`;
   });
 
   // Update positions on tick
