@@ -6,7 +6,7 @@ export const site = {
   separator: ' - ',
 } as const;
 
-// Course information
+// Course information (static metadata)
 export const courseInfo = {
   name: '课程',
   subtitle: '专业必修/选修课',
@@ -14,14 +14,6 @@ export const courseInfo = {
   textbook: '《示例教材》(出版社)',
   prerequisites: '计算机基础、程序设计入门',
   assessment: '出勤(10%) + 平时(30%) + 期末(60%)',
-} as const;
-
-// Stats displayed on homepage
-export const courseStats = {
-  lectures: { count: 15, suffix: '讲课程' },
-  modules: { count: 6, suffix: '大模块' },
-  assignments: { count: 10, suffix: '个作业' },
-  duration: { value: 90, suffix: '分钟/讲' },
 } as const;
 
 // Homepage CTA buttons

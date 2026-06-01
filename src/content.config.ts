@@ -1,5 +1,5 @@
 import { defineCollection, z } from 'astro:content';
-import { courseModules, contentDefaults } from './config/course';
+import { moduleNames, contentDefaults } from './config/course';
 
 const lectures = defineCollection({
   type: 'content',
@@ -7,7 +7,7 @@ const lectures = defineCollection({
     title: z.string(),
     lectureNumber: z.number(),
     week: z.number().optional(),
-    module: z.enum(courseModules.names),
+    module: z.enum(moduleNames),
     description: z.string(),
     duration: z.string().default(contentDefaults.duration),
     difficulty: z.enum(['beginner', 'intermediate', 'advanced']).default('beginner'),

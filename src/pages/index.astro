@@ -3,7 +3,6 @@ import CourseLayout from '../layouts/CourseLayout.astro';
 import { getCollection } from 'astro:content';
 import {
   courseInfo,
-  courseStats,
   homeActions,
   courseModules,
   lectureLabels,
@@ -22,11 +21,22 @@ const sortedLectures = lectures
 const assignments = await getCollection('assignments');
 const assignmentsCount = assignments.filter(a => !a.data.draft).length;
 
-const displayModules = courseModules.display.map((m, i) => ({
-  ...m,
+// Derive module stats from actual lecture data
+const moduleStats = courseModules.map((m, i) => ({
+  name: m.name,
+  description: m.description,
+  count: sortedLectures.filter(l => l.data.module === m.name).length,
   icon: String(i + 1).padStart(2, '0'),
   color: i === 0 ? 'bg-blue-500' : 'bg-green-500',
 }));
+
+// Derived stats (instead of hardcoded config)
+const stats = {
+  lectures: { value: sortedLectures.length, suffix: '讲课程' },
+  modules: { value: courseModules.length, suffix: '大模块' },
+  assignments: { value: assignmentsCount, suffix: '个作业' },
+  duration: { value: '90', suffix: '分钟/讲' },
+};
 ---
 
 <CourseLayout title={pageTitles.home}>
@@ -61,20 +71,20 @@ const displayModules = courseModules.display.map((m, i) => ({
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
         <div class="text-center p-6 bg-bg-secondary rounded-lg">
-          <div class="text-3xl font-bold text-primary">{sortedLectures.length}</div>
-          <div class="text-text-muted mt-1">{courseStats.lectures.suffix}</div>
+          <div class="text-3xl font-bold text-primary">{stats.lectures.value}</div>
+          <div class="text-text-muted mt-1">{stats.lectures.suffix}</div>
         </div>
         <div class="text-center p-6 bg-bg-secondary rounded-lg">
-          <div class="text-3xl font-bold text-primary">{courseModules.names.length}</div>
-          <div class="text-text-muted mt-1">{courseStats.modules.suffix}</div>
+          <div class="text-3xl font-bold text-primary">{stats.modules.value}</div>
+          <div class="text-text-muted mt-1">{stats.modules.suffix}</div>
         </div>
         <div class="text-center p-6 bg-bg-secondary rounded-lg">
-          <div class="text-3xl font-bold text-primary">{assignmentsCount}</div>
-          <div class="text-text-muted mt-1">{courseStats.assignments.suffix}</div>
+          <div class="text-3xl font-bold text-primary">{stats.assignments.value}</div>
+          <div class="text-text-muted mt-1">{stats.assignments.suffix}</div>
         </div>
         <div class="text-center p-6 bg-bg-secondary rounded-lg">
-          <div class="text-3xl font-bold text-primary">{courseStats.duration.value}</div>
-          <div class="text-text-muted mt-1">{courseStats.duration.suffix}</div>
+          <div class="text-3xl font-bold text-primary">{stats.duration.value}</div>
+          <div class="text-text-muted mt-1">{stats.duration.suffix}</div>
         </div>
       </div>
     </div>
@@ -85,7 +95,7 @@ const displayModules = courseModules.display.map((m, i) => ({
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <h2 class="text-2xl font-bold text-center mb-12">{lectureLabels.contentSectionTitle}</h2>
       <div class="grid md:grid-cols-3 gap-6">
-        {displayModules.map((module) => (
+        {moduleStats.map((module) => (
           <div class="bg-white border border-border rounded-lg p-6 hover:shadow-md transition-shadow">
             <div class={`inline-flex items-center justify-center w-12 h-12 rounded-lg ${module.color} text-white font-bold mb-4`}>
               {module.icon}

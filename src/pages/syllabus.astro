@@ -1,7 +1,7 @@
 ---
 import CourseLayout from '../layouts/CourseLayout.astro';
 import { getCollection } from 'astro:content';
-import { sidebarConfig, courseObjectives, syllabusLabels, labels, pageTitles } from '../config';
+import { courseModules, courseObjectives, syllabusLabels, labels, pageTitles } from '../config';
 
 const base = import.meta.env.BASE_URL || '/';
 const lectures = await getCollection('lectures');
@@ -9,11 +9,18 @@ const sortedLectures = lectures
   .filter(l => !l.data.draft)
   .sort((a, b) => a.data.lectureNumber - b.data.lectureNumber);
 
-const moduleDescriptions: Record<string, string> = {
-  'JavaScript基础': 'JavaScript核心语法、DOM操作、事件处理、数据组织与持久化',
-  'Bootstrap框架': '响应式布局、Bootstrap组件与工具类',
-  'Vue.js框架': 'Vue 3基础、组件开发、路由管理、状态管理',
-};
+// Derive module ranges from actual lecture data
+const moduleStats = courseModules.map(module => {
+  const moduleLectures = sortedLectures.filter(l => l.data.module === module.name);
+  const numbers = moduleLectures.map(l => l.data.lectureNumber);
+  const min = numbers.length > 0 ? Math.min(...numbers) : null;
+  const max = numbers.length > 0 ? Math.max(...numbers) : null;
+  return {
+    ...module,
+    count: moduleLectures.length,
+    range: min !== null && max !== null ? [min, max] as const : null,
+  };
+}).filter(m => m.count > 0);
 ---
 
 <CourseLayout title={pageTitles.syllabus}>
@@ -37,12 +44,15 @@ const moduleDescriptions: Record<string, string> = {
     <section class="mb-12">
       <h2 class="text-xl font-semibold mb-6">{syllabusLabels.modulesTitle}</h2>
       <div class="grid md:grid-cols-3 gap-6">
-        {sidebarConfig.modules.map(module => (
+        {moduleStats.map(module => (
           <div class="bg-white border border-border rounded-lg p-6">
             <h3 class="font-semibold text-primary mb-2">{module.name}</h3>
-            <p class="text-sm text-text-muted mb-4">{moduleDescriptions[module.name]}</p>
+            <p class="text-sm text-text-muted mb-4">{module.description}</p>
             <div class="text-sm">
-              <span class="font-medium">{syllabusLabels.courseRangeLabel}</span> {syllabusLabels.lectureRangeTemplate.replace('{start}', String(module.range[0])).replace('{end}', String(module.range[1]))}
+              <span class="font-medium">{syllabusLabels.courseRangeLabel}</span>
+              {module.range
+                ? syllabusLabels.lectureRangeTemplate.replace('{start}', String(module.range[0])).replace('{end}', String(module.range[1]))
+                : '暂无课程'}
             </div>
           </div>
         ))}

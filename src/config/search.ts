@@ -1,5 +1,9 @@
-// Search modal UI text
+// Search configuration - unified across button and modal
 export const searchConfig = {
+  buttonLabel: '搜索',
+  keyboardShortcut: 'Ctrl K',
+  ariaLabel: '搜索',
+  mobileMenuLabel: '打开菜单',
   placeholder: '搜索课程内容...',
   escapeKey: 'Esc',
   emptyState: '输入关键词开始搜索...',

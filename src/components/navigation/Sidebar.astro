@@ -1,6 +1,5 @@
 ---
 import { getCollection } from 'astro:content';
-import { sidebarConfig } from '../../config';
 
 interface Props {
   currentSlug?: string;
@@ -17,7 +16,7 @@ const sortedLectures = lectures
 
 <div class="bg-bg-secondary rounded-lg border border-border p-4">
   <h3 class="text-sm font-semibold text-text-muted uppercase tracking-wide mb-3">
-    {sidebarConfig.title}
+    课程导航
   </h3>
 
   <nav class="space-y-1">
