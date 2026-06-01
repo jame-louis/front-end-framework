@@ -34,6 +34,9 @@ const difficultyColors: Record<string, string> = {
   intermediate: 'bg-yellow-100 text-yellow-700 border-yellow-200',
   advanced: 'bg-red-100 text-red-700 border-red-200',
 };
+
+const allAssignments = await getCollection('assignments');
+const relatedAssignment = allAssignments.find(a => a.data.lectureRef === slug && !a.data.draft);
 ---
 
 <DocLayout
@@ -122,6 +125,26 @@ const difficultyColors: Record<string, string> = {
         <span id="complete-text">{labels.markComplete}</span>
       </button>
     </div>
+
+    <!-- Related Assignment -->
+    {relatedAssignment && (
+      <div class="mb-6 sm:mb-8 p-4 bg-orange-50 border border-orange-200 rounded-lg">
+        <div class="flex items-start sm:items-center gap-3">
+          <span class="text-xl sm:text-2xl flex-shrink-0">📝</span>
+          <div class="flex-1 min-w-0">
+            <p class="text-orange-800 text-sm sm:text-base m-0 font-medium">
+              {lectureLabels.relatedAssignment}: {relatedAssignment.data.title}
+            </p>
+          </div>
+          <a
+            href={`${base}assignments/${relatedAssignment.id.replace('.md', '')}`}
+            class="flex-shrink-0 text-sm font-medium text-orange-600 hover:text-orange-800 whitespace-nowrap"
+          >
+            {labels.viewDetails}
+          </a>
+        </div>
+      </div>
+    )}
 
     <!-- Content -->
     <div class="prose-custom">

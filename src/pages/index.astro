@@ -7,7 +7,6 @@ import {
   courseModules,
   lectureLabels,
   labels,
-  infoSectionLabels,
   pageTitles,
 } from '../config';
 
@@ -18,10 +17,11 @@ const sortedLectures = lectures
   .filter(l => !l.data.draft)
   .sort((a, b) => a.data.lectureNumber - b.data.lectureNumber);
 
+
+// Derive module stats from actual lecture data
 const assignments = await getCollection('assignments');
 const assignmentsCount = assignments.filter(a => !a.data.draft).length;
 
-// Derive module stats from actual lecture data
 const moduleStats = courseModules.map((m, i) => ({
   name: m.name,
   description: m.description,
@@ -31,12 +31,6 @@ const moduleStats = courseModules.map((m, i) => ({
 }));
 
 // Derived stats (instead of hardcoded config)
-const stats = {
-  lectures: { value: sortedLectures.length, suffix: '讲课程' },
-  modules: { value: courseModules.length, suffix: '大模块' },
-  assignments: { value: assignmentsCount, suffix: '个作业' },
-  duration: { value: '90', suffix: '分钟/讲' },
-};
 ---
 
 <CourseLayout title={pageTitles.home}>
@@ -67,44 +61,34 @@ const stats = {
   </section>
 
   <!-- Stats Section -->
-  <section class="py-12 border-b border-border">
+  <section class="py-8 border-b border-border">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="text-center p-6 bg-bg-secondary rounded-lg">
-          <div class="text-3xl font-bold text-primary">{stats.lectures.value}</div>
-          <div class="text-text-muted mt-1">{stats.lectures.suffix}</div>
+      <div class="flex justify-center gap-8 sm:gap-12">
+        <div class="text-center">
+          <div class="text-3xl font-bold text-primary">{sortedLectures.length}</div>
+          <div class="text-text-muted text-sm mt-1">讲课程</div>
         </div>
-        <div class="text-center p-6 bg-bg-secondary rounded-lg">
-          <div class="text-3xl font-bold text-primary">{stats.modules.value}</div>
-          <div class="text-text-muted mt-1">{stats.modules.suffix}</div>
-        </div>
-        <div class="text-center p-6 bg-bg-secondary rounded-lg">
-          <div class="text-3xl font-bold text-primary">{stats.assignments.value}</div>
-          <div class="text-text-muted mt-1">{stats.assignments.suffix}</div>
-        </div>
-        <div class="text-center p-6 bg-bg-secondary rounded-lg">
-          <div class="text-3xl font-bold text-primary">{stats.duration.value}</div>
-          <div class="text-text-muted mt-1">{stats.duration.suffix}</div>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-primary">{assignmentsCount}</div>
+          <div class="text-text-muted text-sm mt-1">个作业</div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Modules Section -->
-  <section class="py-16">
+  <section class="py-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h2 class="text-2xl font-bold text-center mb-12">{lectureLabels.contentSectionTitle}</h2>
-      <div class="grid md:grid-cols-3 gap-6">
+      <h2 class="text-xl font-bold text-center mb-8">{lectureLabels.contentSectionTitle}</h2>
+      <div class="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto">
         {moduleStats.map((module) => (
-          <div class="bg-white border border-border rounded-lg p-6 hover:shadow-md transition-shadow">
-            <div class={`inline-flex items-center justify-center w-12 h-12 rounded-lg ${module.color} text-white font-bold mb-4`}>
-              {module.icon}
-            </div>
-            <h3 class="text-lg font-semibold mb-2">{module.name}</h3>
-            <p class="text-text-muted text-sm">
-              {lectureLabels.moduleCountTemplate.replace('{count}', String(module.count))}
-            </p>
-          </div>
+          <a
+            href={`${base}lectures`}
+            class="bg-white border border-border rounded-lg p-5 hover:border-primary hover:shadow-sm transition-all"
+          >
+            <h3 class="font-semibold text-primary mb-1">{module.name}</h3>
+            <p class="text-text-muted text-sm">{module.description}</p>
+          </a>
         ))}
       </div>
     </div>
@@ -135,26 +119,4 @@ const stats = {
     </div>
   </section>
 
-  <!-- Course Info -->
-  <section class="py-16">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="bg-bg-secondary rounded-lg p-8">
-        <h2 class="text-xl font-bold mb-6">{infoSectionLabels.courseInfoTitle}</h2>
-        <div class="grid md:grid-cols-3 gap-6 text-sm">
-          <div>
-            <h4 class="font-semibold text-text-muted mb-2">{infoSectionLabels.textbookLabel}</h4>
-            <p>{courseInfo.textbook}</p>
-          </div>
-          <div>
-            <h4 class="font-semibold text-text-muted mb-2">{infoSectionLabels.prerequisitesLabel}</h4>
-            <p>{courseInfo.prerequisites}</p>
-          </div>
-          <div>
-            <h4 class="font-semibold text-text-muted mb-2">{infoSectionLabels.assessmentLabel}</h4>
-            <p>{courseInfo.assessment}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
 </CourseLayout>

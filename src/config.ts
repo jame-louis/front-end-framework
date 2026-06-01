@@ -83,6 +83,9 @@ export const lectureLabels = {
   contentSectionTitle: '课程内容',
   countSuffix: '讲课程',
   moduleCountTemplate: '包含 {count} 讲课程',
+  hasSlidesBadge: '有课件',
+  slidevBanner: '本讲提供 Slidev 在线课件',
+  relatedAssignment: '相关作业',
 } as const;
 
 export const assignmentLabels = {
