@@ -11,6 +11,10 @@ export interface StreamCallbacks {
   onError: (error: Error) => void;
 }
 
+export interface StreamOptions {
+  signal?: AbortSignal;
+}
+
 export class AIClient {
   private settings: AISettings;
 
@@ -18,23 +22,23 @@ export class AIClient {
     this.settings = settings;
   }
 
-  async streamChat(messages: Message[], callbacks: StreamCallbacks): Promise<void> {
+  async streamChat(messages: Message[], callbacks: StreamCallbacks, options?: StreamOptions): Promise<void> {
     switch (this.settings.provider) {
       case 'anthropic':
-        await this.streamAnthropic(messages, callbacks);
+        await this.streamAnthropic(messages, callbacks, options);
         break;
       case 'openai':
-        await this.streamOpenAI(messages, callbacks);
+        await this.streamOpenAI(messages, callbacks, options);
         break;
       case 'custom':
-        await this.streamCustom(messages, callbacks);
+        await this.streamCustom(messages, callbacks, options);
         break;
       default:
         throw new Error(`Unknown provider: ${this.settings.provider}`);
     }
   }
 
-  private async streamAnthropic(messages: Message[], callbacks: StreamCallbacks): Promise<void> {
+  private async streamAnthropic(messages: Message[], callbacks: StreamCallbacks, options?: StreamOptions): Promise<void> {
     const url = this.settings.apiUrl || 'https://api.anthropic.com/v1/messages';
 
     const systemMessage = messages.find(m => m.role === 'system');
@@ -57,6 +61,7 @@ export class AIClient {
           content: m.content,
         })),
       }),
+      signal: options?.signal,
     });
 
     if (!response.ok) {
@@ -67,7 +72,7 @@ export class AIClient {
     await this.handleStream(response, callbacks, 'anthropic');
   }
 
-  private async streamOpenAI(messages: Message[], callbacks: StreamCallbacks): Promise<void> {
+  private async streamOpenAI(messages: Message[], callbacks: StreamCallbacks, options?: StreamOptions): Promise<void> {
     const url = this.settings.apiUrl || 'https://api.openai.com/v1/chat/completions';
 
     const response = await fetch(url, {
@@ -84,6 +89,7 @@ export class AIClient {
           content: m.content,
         })),
       }),
+      signal: options?.signal,
     });
 
     if (!response.ok) {
@@ -101,7 +107,7 @@ export class AIClient {
     await this.handleStream(response, callbacks, 'openai');
   }
 
-  private async streamCustom(messages: Message[], callbacks: StreamCallbacks): Promise<void> {
+  private async streamCustom(messages: Message[], callbacks: StreamCallbacks, options?: StreamOptions): Promise<void> {
     if (!this.settings.apiUrl) {
       throw new Error('Custom API URL is required');
     }
@@ -121,6 +127,7 @@ export class AIClient {
           content: m.content,
         })),
       }),
+      signal: options?.signal,
     });
 
     if (!response.ok) {
@@ -142,6 +149,7 @@ export class AIClient {
     const decoder = new TextDecoder();
     let buffer = '';
     let hasError = false;
+    let isAborted = false;
 
     try {
       while (true) {
@@ -163,31 +171,35 @@ export class AIClient {
               let content: string | undefined;
 
               if (provider === 'anthropic') {
-                // Handle Anthropic's streaming format
+                // Handle Anthropic's streaming format - continue on parse errors
                 if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
                   content = parsed.delta.text;
                 }
               } else {
-                // OpenAI format
+                // OpenAI format - skip chunks that don't have delta content
                 content = parsed.choices?.[0]?.delta?.content;
               }
 
               if (content) {
                 callbacks.onChunk(content);
               }
-            } catch (e) {
-              // Log parse errors for debugging but continue
-              console.debug('Failed to parse stream chunk:', line, e);
+            } catch {
+              // Skip malformed chunks and continue streaming
             }
           }
         }
       }
     } catch (error) {
+      // Don't treat abort as an error
+      if (error instanceof Error && error.name === 'AbortError') {
+        isAborted = true;
+        return;
+      }
       hasError = true;
       callbacks.onError(error instanceof Error ? error : new Error(String(error)));
     } finally {
       reader.releaseLock();
-      if (!hasError) {
+      if (!hasError && !isAborted) {
         callbacks.onComplete();
       }
     }

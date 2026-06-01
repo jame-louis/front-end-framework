@@ -228,6 +228,7 @@ const { context } = Astro.props;
   let isOpen = false;
   let currentMode: 'explain' | 'breakdown' | 'practice' = 'explain';
   let isStreaming = false;
+  let currentAbortController: AbortController | null = null;
   const context = JSON.parse(container?.getAttribute('data-context') || 'null');
 
   // Set context title
@@ -249,6 +250,13 @@ const { context } = Astro.props;
       isOpen = false;
       panel?.classList.add('hidden');
       toggleBtn?.classList.remove('bg-primary-dark');
+    }
+  });
+
+  // Cleanup stream on page unload
+  window.addEventListener('beforeunload', () => {
+    if (currentAbortController) {
+      currentAbortController.abort();
     }
   });
 
@@ -374,6 +382,12 @@ const { context } = Astro.props;
       return;
     }
 
+    // Cancel any existing stream
+    if (currentAbortController) {
+      currentAbortController.abort();
+      currentAbortController = null;
+    }
+
     addMessage(content, 'user');
     input.value = '';
 
@@ -383,6 +397,7 @@ const { context } = Astro.props;
 
     const assistantDiv = addStreamingMessage();
     isStreaming = true;
+    currentAbortController = new AbortController();
 
     const settings = getAISettings();
     const client = new AIClient(settings);
@@ -402,18 +417,30 @@ const { context } = Astro.props;
           },
           onComplete: () => {
             isStreaming = false;
+            currentAbortController = null;
             finalizeStreamingMessage(assistantDiv, fullResponse);
             addUnderstandingRating();
           },
           onError: (error) => {
             isStreaming = false;
-            updateStreamingMessage(assistantDiv, `错误：${error.message}`);
+            currentAbortController = null;
+            finalizeStreamingMessage(assistantDiv, fullResponse);
+            addMessage(`请求失败：${error.message}`, 'assistant');
           }
-        }
+        },
+        { signal: currentAbortController.signal }
       );
     } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        isStreaming = false;
+        currentAbortController = null;
+        finalizeStreamingMessage(assistantDiv, fullResponse || '已取消');
+        return;
+      }
       isStreaming = false;
-      updateStreamingMessage(assistantDiv, `错误：${error instanceof Error ? error.message : '未知错误'}`);
+      currentAbortController = null;
+      finalizeStreamingMessage(assistantDiv, fullResponse);
+      addMessage(`请求失败：${error instanceof Error ? error.message : '未知错误'}`, 'assistant');
     }
   }
 
