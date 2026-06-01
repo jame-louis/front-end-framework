@@ -28,6 +28,7 @@ export const mainNavItems = [
   { label: '课程大纲', href: '/syllabus' },
   { label: '课程', href: '/lectures' },
   { label: '作业', href: '/assignments' },
+  { label: '知识图谱', href: '/concept-map' },
 ] as const;
 
 export const footerConfig = {
@@ -40,6 +41,7 @@ export const pageTitles = {
   lectures: '课程列表',
   assignments: '作业',
   syllabus: '课程大纲',
+  conceptMap: '知识图谱',
 } as const;
 
 // Course modules
