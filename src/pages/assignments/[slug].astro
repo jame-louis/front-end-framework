@@ -8,7 +8,7 @@ export async function getStaticPaths() {
   return assignments
     .filter(a => !a.data.draft)
     .map(assignment => ({
-      params: { slug: assignment.id },
+      params: { slug: assignment.id.replace('.md', '') },
       props: { assignment },
     }));
 }

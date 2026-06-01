@@ -36,7 +36,7 @@ const sortedAssignments = assignments
                 <span>{assignmentLabels.points} {hw.data.points}分</span>
               </div>
               <a
-                href={`${base}assignments/${hw.id}`}
+                href={`${base}assignments/${hw.id.replace('.md', '')}`}
                 class="inline-flex items-center text-primary hover:text-primary-dark font-medium"
               >
                 {labels.viewDetails}
