@@ -147,11 +147,21 @@ const { context } = Astro.props;
           />
         </div>
 
-        <div>
+        <div id="model-select-container">
           <label class="block text-sm font-medium text-text mb-1">模型</label>
           <select id="settings-model" class="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
             <!-- Populated by JS -->
           </select>
+        </div>
+
+        <div id="custom-model-container" class="hidden">
+          <label class="block text-sm font-medium text-text mb-1">自定义模型名称</label>
+          <input
+            type="text"
+            id="settings-custom-model"
+            placeholder="例如：gpt-4, claude-3-opus, 或其他模型名"
+            class="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+          />
         </div>
 
         <div>
@@ -205,10 +215,13 @@ const { context } = Astro.props;
   const settingsForm = document.getElementById('tutor-settings-form');
   const settingsProvider = document.getElementById('settings-provider') as HTMLSelectElement;
   const settingsModel = document.getElementById('settings-model') as HTMLSelectElement;
+  const settingsCustomModel = document.getElementById('settings-custom-model') as HTMLInputElement;
   const settingsApiKey = document.getElementById('settings-api-key') as HTMLInputElement;
   const settingsApiUrl = document.getElementById('settings-api-url') as HTMLInputElement;
   const settingsEnabled = document.getElementById('settings-enabled') as HTMLInputElement;
   const customUrlContainer = document.getElementById('custom-url-container');
+  const modelSelectContainer = document.getElementById('model-select-container');
+  const customModelContainer = document.getElementById('custom-model-container');
   const contextTitle = document.getElementById('tutor-context-title');
 
   // State
@@ -267,14 +280,25 @@ const { context } = Astro.props;
   function openSettings() {
     const settings = getAISettings();
     settingsProvider.value = settings.provider;
-    settingsModel.innerHTML = PROVIDER_MODELS[settings.provider].map(m =>
-      `<option value="${m}">${getModelDisplayName(m)}</option>`
-    ).join('');
-    settingsModel.value = settings.model;
+
+    // Toggle between model select and custom model input
+    const isCustom = settings.provider === 'custom';
+    modelSelectContainer?.classList.toggle('hidden', isCustom);
+    customModelContainer?.classList.toggle('hidden', !isCustom);
+
+    if (isCustom) {
+      settingsCustomModel.value = settings.model;
+    } else {
+      settingsModel.innerHTML = PROVIDER_MODELS[settings.provider].map(m =>
+        `<option value="${m}">${getModelDisplayName(m)}</option>`
+      ).join('');
+      settingsModel.value = settings.model;
+    }
+
     settingsApiKey.value = settings.apiKey;
     settingsApiUrl.value = settings.apiUrl;
     settingsEnabled.checked = settings.enabled;
-    customUrlContainer?.classList.toggle('hidden', settings.provider !== 'custom');
+    customUrlContainer?.classList.toggle('hidden', !isCustom);
     settingsModal?.classList.remove('hidden');
   }
 
@@ -301,19 +325,32 @@ const { context } = Astro.props;
   // Provider change updates models
   settingsProvider?.addEventListener('change', () => {
     const provider = settingsProvider.value;
-    customUrlContainer?.classList.toggle('hidden', provider !== 'custom');
-    const models = PROVIDER_MODELS[provider] || [];
-    settingsModel.innerHTML = models.map(m =>
-      `<option value="${m}">${getModelDisplayName(m)}</option>`
-    ).join('');
+    const isCustom = provider === 'custom';
+
+    // Toggle containers
+    customUrlContainer?.classList.toggle('hidden', !isCustom);
+    modelSelectContainer?.classList.toggle('hidden', isCustom);
+    customModelContainer?.classList.toggle('hidden', !isCustom);
+
+    if (isCustom) {
+      // For custom provider, user will type model name
+      settingsCustomModel.value = '';
+    } else {
+      // For known providers, populate dropdown
+      const models = PROVIDER_MODELS[provider] || [];
+      settingsModel.innerHTML = models.map(m =>
+        `<option value="${m}">${getModelDisplayName(m)}</option>`
+      ).join('');
+    }
   });
 
   // Save settings
   settingsForm?.addEventListener('submit', (e) => {
     e.preventDefault();
+    const isCustom = settingsProvider.value === 'custom';
     saveAISettings({
       provider: settingsProvider.value as 'openai' | 'anthropic' | 'custom',
-      model: settingsModel.value,
+      model: isCustom ? settingsCustomModel.value : settingsModel.value,
       apiKey: settingsApiKey.value,
       apiUrl: settingsApiUrl.value,
       enabled: settingsEnabled.checked,
