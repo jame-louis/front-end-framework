@@ -1,15 +1,6 @@
 import { defineCollection, z } from 'astro:content';
 import { moduleNames, contentDefaults } from './config';
 
-export const selfCheckQuestionSchema = z.object({
-  id: z.string(),
-  question: z.string(),
-  answer: z.string(),
-  hint: z.string().optional(),
-});
-
-export type SelfCheckQuestion = z.infer<typeof selfCheckQuestionSchema>;
-
 const lectures = defineCollection({
   type: 'content',
   schema: z.object({
@@ -25,7 +16,6 @@ const lectures = defineCollection({
     hasAssignment: z.boolean().default(false),
     slidevUrl: z.string().optional(),
     draft: z.boolean().default(false),
-    selfCheckQuestions: z.array(selfCheckQuestionSchema).default([]),
   }),
 });
 
@@ -46,7 +36,21 @@ const assignments = defineCollection({
   }),
 });
 
+const selfchecks = defineCollection({
+  type: 'content',
+  schema: z.object({
+    question: z.string(),
+    answer: z.string(),
+    explanation: z.string(),
+    module: z.enum(moduleNames),
+    tags: z.array(z.string()).default([]),
+    relatedLectures: z.array(z.string()).default([]),
+    draft: z.boolean().default(false),
+  }),
+});
+
 export const collections = {
   lectures,
   assignments,
+  selfchecks,
 };

@@ -11,18 +11,6 @@ tags: ["课程介绍", "开发环境", "工具链"]
 hasSlides: false
 hasAssignment: true
 draft: false
-selfCheckQuestions:
-  - id: "env-check"
-    question: "如何验证 Node.js 是否安装成功？"
-    answer: "在终端运行 `node --version` 命令，如果显示版本号则表示安装成功。"
-    hint: "使用命令行工具，输入 node 加上两个短横线"
-  - id: "html-structure"
-    question: "HTML 文件的基本结构包含哪些必要标签？"
-    answer: "<!DOCTYPE html>、<html>、<head>、<body> 是构成 HTML 文档的必要标签。"
-    hint: "文档类型声明和三个主要结构标签"
-  - id: "vs-code-ext"
-    question: "VS Code 中推荐安装哪些前端开发扩展？"
-    answer: "Live Server（实时预览）、Prettier（代码格式化）、ESLint（代码检查）等。"
 ---
 
 ## 学习目标

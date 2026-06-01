@@ -2,7 +2,6 @@
 import DocLayout from '../../layouts/DocLayout.astro';
 import { getCollection, render } from 'astro:content';
 import { difficultyLabels, labels, lectureLabels } from '../../config';
-import SelfCheckQuestions from '../../components/content/SelfCheckQuestions.astro';
 
 export async function getStaticPaths() {
   const lectures = await getCollection('lectures');
@@ -151,9 +150,6 @@ const relatedAssignment = allAssignments.find(a => a.data.lectureRef === slug &&
     <div class="prose-custom">
       <Content />
     </div>
-
-    <!-- Self-check Questions -->
-    <SelfCheckQuestions questions={lecture.data.selfCheckQuestions} lectureSlug={slug} />
   </article>
 
   <!-- Prev/Next Navigation -->
