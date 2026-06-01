@@ -106,8 +106,29 @@ export class AIClient {
       throw new Error('Custom API URL is required');
     }
 
-    // Custom provider - assumes OpenAI-compatible format
-    await this.streamOpenAI(messages, callbacks);
+    // Custom provider - uses OpenAI-compatible format but with custom URL
+    const response = await fetch(this.settings.apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.settings.apiKey}`,
+      },
+      body: JSON.stringify({
+        model: this.settings.model,
+        stream: true,
+        messages: messages.map(m => ({
+          role: m.role,
+          content: m.content,
+        })),
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Custom API error: ${errorText}`);
+    }
+
+    await this.handleStream(response, callbacks, 'openai');
   }
 
   private async handleStream(
@@ -120,6 +141,7 @@ export class AIClient {
 
     const decoder = new TextDecoder();
     let buffer = '';
+    let hasError = false;
 
     try {
       while (true) {
@@ -134,7 +156,6 @@ export class AIClient {
           if (line.startsWith('data: ')) {
             const data = line.slice(6);
             if (data === '[DONE]') {
-              callbacks.onComplete();
               return;
             }
             try {
@@ -142,25 +163,33 @@ export class AIClient {
               let content: string | undefined;
 
               if (provider === 'anthropic') {
-                content = parsed.type === 'content_block_delta' ? parsed.delta?.text : undefined;
+                // Handle Anthropic's streaming format
+                if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
+                  content = parsed.delta.text;
+                }
               } else {
+                // OpenAI format
                 content = parsed.choices?.[0]?.delta?.content;
               }
 
               if (content) {
                 callbacks.onChunk(content);
               }
-            } catch {
-              // Ignore parse errors
+            } catch (e) {
+              // Log parse errors for debugging but continue
+              console.debug('Failed to parse stream chunk:', line, e);
             }
           }
         }
       }
     } catch (error) {
+      hasError = true;
       callbacks.onError(error instanceof Error ? error : new Error(String(error)));
     } finally {
       reader.releaseLock();
+      if (!hasError) {
+        callbacks.onComplete();
+      }
     }
-    callbacks.onComplete();
   }
 }
