@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is an Astro-based static site template for university course websites (前端框架课程). It provides a complete system for managing course lectures, assignments, projects, and materials with features like progress tracking, search, and responsive design.
+This is an Astro-based static site template for university course websites (前端框架课程). It provides a complete system for managing course lectures and assignments with features like progress tracking, search, and responsive design.
 
 ## Development Commands
 
@@ -15,7 +15,7 @@ npm install
 # Start development server
 npm run dev
 
-# Build for production (includes Pagefind search index generation)
+# Build for production
 npm run build
 
 # Preview production build
@@ -26,10 +26,8 @@ npm run preview
 
 Content is managed through Astro's content collections defined in `src/content.config.ts`:
 
-- **lectures**: Course lectures with frontmatter metadata (lectureNumber, module, difficulty, etc.)
+- **lectures**: Course lectures with frontmatter metadata
 - **assignments**: Homework assignments linked to lectures via `lectureRef`
-- **projects**: Course projects with milestones
-- **materials**: External resources (articles, videos, tools)
 
 Content files are stored in `src/content/{collection}/` as Markdown with YAML frontmatter.
 
@@ -52,6 +50,38 @@ draft: boolean
 ---
 ```
 
+### Assignment Frontmatter Schema
+
+```yaml
+---
+title: string
+assignmentNumber: number
+lectureRef: string  # Matches lecture slug (e.g., "lecture01")
+week: number (optional)
+difficulty: 'easy' | 'medium' | 'hard'
+estimatedHours: number (optional)
+points: number (optional)
+submissionFormat: string
+downloadFile: string (optional)
+dueDate: date (optional)
+draft: boolean
+---
+```
+
+## Central Configuration
+
+`src/config.ts` is the single source of truth for site configuration:
+
+- `site`: Site metadata (title, description, lang)
+- `courseInfo`: Course details (name, textbook, prerequisites, assessment)
+- `mainNavItems`: Top navigation links
+- `courseModules`: Module definitions for lectures
+- `moduleNames`: Derived array of valid module names
+- `labels`: All UI text strings
+- `lectureLabels`, `assignmentLabels`, `syllabusLabels`: Page-specific labels
+
+Always modify this file when changing navigation, labels, or course structure.
+
 ## Layout Hierarchy
 
 - `BaseLayout.astro`: Root HTML structure, global styles
@@ -62,11 +92,11 @@ draft: boolean
 
 - `src/components/navigation/Sidebar.astro`: Lecture navigation sidebar
 - `src/components/content/TOCSidebar.astro`: Table of contents from headings
-- `src/components/search/`: Pagefind search modal integration
+- `src/components/search/SearchModal.astro`: Fuse.js search modal integration
 
 ## Styling System
 
-Uses Tailwind CSS v4 with custom theme defined in `src/styles/global.css`:
+Uses Tailwind CSS v3 with custom theme defined in `src/styles/global.css`:
 
 ```css
 @theme {
@@ -89,20 +119,20 @@ Custom prose styles via `.prose-custom` class for content rendering.
 - `markComplete(slug)`, `markIncomplete(slug)`, `toggleComplete(slug)`
 - `getCompletionPercentage(total)` for progress bar
 
-Used in lecture pages with "Mark Complete" buttons and shown on lecture list page.
+Used in lecture pages with "Mark Complete" buttons.
 
 ### Search
-Pagefind is integrated for static search:
-- Indexes built during `postbuild` script
+Fuse.js is integrated for client-side search:
+- Search index built from content collections at build time
 - Search modal in `src/components/search/SearchModal.astro`
 - Triggered via keyboard shortcut (Ctrl/Cmd+K) or button
 
 ## Build Configuration
 
 - Static output (`output: 'static'`)
+- Base URL: `/course-template-astro/` (configured in `astro.config.mjs`)
 - Shiki syntax highlighting with GitHub Dark theme
 - Rehype plugins: `rehype-slug`, `rehype-autolink-headings` for TOC generation
-- Tailwind CSS via Vite plugin
 
 ## Deployment
 
@@ -112,5 +142,5 @@ GitHub Actions workflow (`.github/workflows/deploy.yml`) deploys to GitHub Pages
 
 - Update `site` URL in `astro.config.mjs` before deploying
 - Draft content (frontmatter: `draft: true`) is filtered out in production
-- Pagefind search index is generated after build; requires `npm run build` (not just `astro build`)
-- Mobile-first responsive design with touch-friendly targets
+- Mobile-first responsive design with touch-friendly targets (44px minimum)
+- New modules must be added to `courseModules` in `src/config.ts` before use in lecture frontmatter
