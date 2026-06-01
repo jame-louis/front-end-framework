@@ -8,8 +8,8 @@ export const site = {
 
 // Course information
 export const courseInfo = {
-  name: '前端框架课程',
-  subtitle: '计算机专业选修课',
+  name: '课程',
+  subtitle: '专业必修/选修课',
   description: '在这里填写课程的简要描述，介绍课程目标、适用人群和学习成果。',
   textbook: '《示例教材》(出版社)',
   prerequisites: '计算机基础、程序设计入门',

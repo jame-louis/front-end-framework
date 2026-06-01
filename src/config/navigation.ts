@@ -28,7 +28,7 @@ export const tocConfig = {
 
 // Footer configuration
 export const footerConfig = {
-  text: '前端框架课程 - 计算机专业选修课',
+  text: '课程 - 计算机专业选修课',
   copyright: '前端框架课程',
 } as const;
 
