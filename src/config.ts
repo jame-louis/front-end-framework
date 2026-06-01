@@ -48,8 +48,9 @@ export const pageTitles = {
 
 // Course modules
 export const courseModules = [
-  { name: '基础入门', description: '课程介绍、环境搭建、开发工具' },
-  { name: '核心概念', description: '响应式设计、组件化思想、现代前端开发流程' },
+  { name: 'JavaScript基础', description: '课程介绍、环境搭建、开发工具' },
+  { name: 'Bootstrap框架', description: '响应式设计、组件化思想、现代前端开发流程' },
+  { name: 'Vue.js框架', description: '响应式设计、组件化思想、现代前端开发流程' },
 ] as const;
 
 export const moduleNames = courseModules.map(m => m.name);
