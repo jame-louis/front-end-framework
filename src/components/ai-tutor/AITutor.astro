@@ -54,14 +54,14 @@ const { context } = Astro.props;
     </div>
 
     <!-- Mode Selector -->
-    <div class="border-b border-border p-2 flex gap-2 overflow-x-auto">
-      <button class="tutor-mode-btn active px-3 py-1.5 text-sm rounded-full bg-primary text-white whitespace-nowrap transition-colors" data-mode="explain">
+    <div class="border-b border-border p-2 flex gap-2 overflow-x-auto" id="mode-selector">
+      <button class="tutor-mode-btn active px-3 py-1.5 text-sm rounded-full bg-primary text-white whitespace-nowrap transition-all duration-200 ease-out hover:opacity-90 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:opacity-50 disabled:active:scale-100" data-mode="explain" aria-pressed="true">
         💡 讲解模式
       </button>
-      <button class="tutor-mode-btn px-3 py-1.5 text-sm rounded-full bg-bg-secondary text-text-muted hover:bg-border whitespace-nowrap transition-colors" data-mode="breakdown">
+      <button class="tutor-mode-btn px-3 py-1.5 text-sm rounded-full bg-bg-secondary text-text-muted hover:bg-border hover:text-text whitespace-nowrap transition-all duration-200 ease-out hover:opacity-90 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:opacity-50 disabled:hover:bg-bg-secondary disabled:active:scale-100" data-mode="breakdown" aria-pressed="false">
         🔍 第一性原理
       </button>
-      <button class="tutor-mode-btn px-3 py-1.5 text-sm rounded-full bg-bg-secondary text-text-muted hover:bg-border whitespace-nowrap transition-colors" data-mode="practice">
+      <button class="tutor-mode-btn px-3 py-1.5 text-sm rounded-full bg-bg-secondary text-text-muted hover:bg-border hover:text-text whitespace-nowrap transition-all duration-200 ease-out hover:opacity-90 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:opacity-50 disabled:hover:bg-bg-secondary disabled:active:scale-100" data-mode="practice" aria-pressed="false">
         🎯 刻意练习
       </button>
     </div>
@@ -263,16 +263,33 @@ const { context } = Astro.props;
   // Mode selection
   modeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
+      const newMode = btn.getAttribute('data-mode') as 'explain' | 'breakdown' | 'practice';
+
+      // Only change if mode is different
+      if (newMode === currentMode) return;
+
+      // Update visual state
       modeBtns.forEach(b => {
-        b.classList.remove('active', 'bg-primary', 'text-white');
-        b.classList.add('bg-bg-secondary', 'text-text-muted');
+        const isTarget = b === btn;
+        b.classList.toggle('active', isTarget);
+        b.classList.toggle('bg-primary', isTarget);
+        b.classList.toggle('text-white', isTarget);
+        b.classList.toggle('bg-bg-secondary', !isTarget);
+        b.classList.toggle('text-text-muted', !isTarget);
+        b.setAttribute('aria-pressed', isTarget ? 'true' : 'false');
       });
-      btn.classList.add('active', 'bg-primary', 'text-white');
-      btn.classList.remove('bg-bg-secondary', 'text-text-muted');
-      currentMode = btn.getAttribute('data-mode') as 'explain' | 'breakdown' | 'practice';
+
+      currentMode = newMode;
       handleModeChange();
     });
   });
+
+  // Update mode buttons disabled state based on streaming
+  function updateModeButtonsDisabled(): void {
+    modeBtns.forEach(btn => {
+      btn.disabled = isStreaming;
+    });
+  }
 
   function handleModeChange() {
     const modeDescriptions: Record<string, string> = {
@@ -397,6 +414,7 @@ const { context } = Astro.props;
 
     const assistantDiv = addStreamingMessage();
     isStreaming = true;
+    updateModeButtonsDisabled();
     currentAbortController = new AbortController();
 
     const settings = getAISettings();
@@ -418,12 +436,14 @@ const { context } = Astro.props;
           onComplete: () => {
             isStreaming = false;
             currentAbortController = null;
+            updateModeButtonsDisabled();
             finalizeStreamingMessage(assistantDiv, fullResponse);
             addUnderstandingRating();
           },
           onError: (error) => {
             isStreaming = false;
             currentAbortController = null;
+            updateModeButtonsDisabled();
             finalizeStreamingMessage(assistantDiv, fullResponse);
             addMessage(`请求失败：${error.message}`, 'assistant');
           }
@@ -434,11 +454,13 @@ const { context } = Astro.props;
       if (error instanceof Error && error.name === 'AbortError') {
         isStreaming = false;
         currentAbortController = null;
+        updateModeButtonsDisabled();
         finalizeStreamingMessage(assistantDiv, fullResponse || '已取消');
         return;
       }
       isStreaming = false;
       currentAbortController = null;
+      updateModeButtonsDisabled();
       finalizeStreamingMessage(assistantDiv, fullResponse);
       addMessage(`请求失败：${error instanceof Error ? error.message : '未知错误'}`, 'assistant');
     }
