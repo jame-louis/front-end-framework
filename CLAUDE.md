@@ -144,3 +144,47 @@ GitHub Actions workflow (`.github/workflows/deploy.yml`) deploys to GitHub Pages
 - Draft content (frontmatter: `draft: true`) is filtered out in production
 - Mobile-first responsive design with touch-friendly targets (44px minimum)
 - New modules must be added to `courseModules` in `src/config.ts` before use in lecture frontmatter
+
+## Content Generation
+
+Source files in `sources/` are transformed into content files in `src/content/`.
+
+### Quick Commands
+
+```bash
+# Generate all content from sources/
+@content-generate
+
+# Generate specific lecture with its assignment and self-checks
+@content-generate lecture-01-intro.md
+
+# Force overwrite existing files
+@content-generate --force
+```
+
+### Source File Structure
+
+See `sources/README.md` for templates and naming conventions.
+
+Key points:
+- Lecture sources: `lecture-{NN}-{slug}.md`
+- Assignment sources: `lecture-{NN}-{slug}-assignment.md`
+- Self-check sources: `lecture-{NN}-{slug}-selfcheck.md`
+- Use `<!-- expand -->` markers to indicate bullets that should become prose
+- `{NN}` is zero-padded lecture number (01, 02, etc.)
+
+### Self-Check Schema
+
+Self-checks are stored as individual Q&A items:
+
+```yaml
+---
+question: string
+answer: string
+explanation: string
+module: string
+tags: string[]
+relatedLectures: string[]
+draft: boolean
+---
+```
