@@ -327,7 +327,7 @@ const base = import.meta.env.BASE_URL;
   let currentMode: 'study' | 'browse' = 'study';
   let sessionQueue: string[] = [];
   let currentCardIndex = 0;
-  let sessionStats = { hard: 0, medium: 0, easy: 0 };
+  let sessionStats = { hard: 0, medium: 0, easy: 0, totalReviewed: 0 };
 
   // ==================== SRS Functions ====================
   function getSRSData(): Record<string, CardState> {
@@ -349,7 +349,7 @@ const base = import.meta.env.BASE_URL;
     };
   }
 
-  function calculateNextReview(rating: number, currentState: CardState): CardState {
+  function calculateNextReview(rating: number, currentState: CardState, inSession: boolean = true): CardState {
     const now = Date.now();
     let newBox = currentState.box;
 
@@ -365,9 +365,17 @@ const base = import.meta.env.BASE_URL;
       newBox = Math.min(3, currentState.box + 1);
     }
 
-    // Calculate interval based on box
-    // Box 0/1: 10 minutes, Box 2: 1 day, Box 3: 3 days
-    const intervals = [10 * 60 * 1000, 10 * 60 * 1000, 24 * 60 * 60 * 1000, 3 * 24 * 60 * 60 * 1000];
+    // Calculate interval based on box and context
+    // In-session: immediate repetition for learning (seconds to minutes)
+    // Across sessions: days for long-term retention
+    let intervals: number[];
+    if (inSession) {
+      // During a study session: 3 cards later for hard, end of session for medium, done for easy
+      intervals = [0, 3 * 60 * 1000, 30 * 60 * 1000, 24 * 60 * 60 * 1000]; // immediate, 3min, 30min, 1day
+    } else {
+      // Across sessions: proper spaced repetition
+      intervals = [10 * 60 * 1000, 24 * 60 * 60 * 1000, 3 * 24 * 60 * 60 * 1000, 7 * 24 * 60 * 60 * 1000];
+    }
     const nextReview = now + intervals[newBox];
 
     return {
@@ -389,6 +397,17 @@ const base = import.meta.env.BASE_URL;
     if (rating === 1) sessionStats.hard++;
     else if (rating === 2) sessionStats.medium++;
     else sessionStats.easy++;
+    sessionStats.totalReviewed++;
+
+    // Update display immediately
+    updateSessionStatsDisplay();
+  }
+
+  function updateSessionStatsDisplay() {
+    const statsEl = document.getElementById('session-stats');
+    if (statsEl) {
+      statsEl.textContent = `掌握: ${sessionStats.easy} | 复习: ${sessionStats.totalReviewed}`;
+    }
   }
 
   function getDueCards(moduleFilter: string = 'all'): CardData[] {
@@ -452,7 +471,10 @@ const base = import.meta.env.BASE_URL;
     // Shuffle cards
     sessionQueue = dueCards.map(c => c.slug).sort(() => Math.random() - 0.5);
     currentCardIndex = 0;
-    sessionStats = { hard: 0, medium: 0, easy: 0 };
+    sessionStats = { hard: 0, medium: 0, easy: 0, totalReviewed: 0 };
+
+    // Reset stats display
+    updateSessionStatsDisplay();
 
     // Show active session UI
     document.getElementById('session-setup')?.classList.add('hidden');
@@ -527,6 +549,12 @@ const base = import.meta.env.BASE_URL;
     document.getElementById('stats-medium')!.textContent = String(sessionStats.medium);
     document.getElementById('stats-easy')!.textContent = String(sessionStats.easy);
 
+    // Update the summary text with total
+    const summaryEl = document.querySelector('#session-complete p.text-gray-600');
+    if (summaryEl) {
+      summaryEl.textContent = `共复习 ${sessionStats.totalReviewed} 道题，学习进度已保存`;
+    }
+
     updateDueCount();
   }
 
@@ -554,6 +582,15 @@ const base = import.meta.env.BASE_URL;
         b.classList.remove('ring-2', 'ring-offset-2', 'ring-primary');
       });
       btn.classList.add('ring-2', 'ring-offset-2', 'ring-primary');
+
+      // Spaced repetition: re-insert hard cards into queue
+      if (level === 1 && currentCardIndex < sessionQueue.length - 1) {
+        // Insert 2-3 cards later for immediate review
+        const reinsertIndex = Math.min(currentCardIndex + 3, sessionQueue.length);
+        sessionQueue.splice(reinsertIndex, 0, slug);
+        // Update progress display
+        document.getElementById('session-progress')!.textContent = `${currentCardIndex + 1}/${sessionQueue.length}`;
+      }
 
       // Auto-advance after short delay
       setTimeout(nextCard, 300);
@@ -639,6 +676,12 @@ const base = import.meta.env.BASE_URL;
     } else if (e.key === '1' && frontHidden) {
       const slug = sessionQueue[currentCardIndex];
       rateCard(slug, 1);
+      // Re-insert hard cards for spaced repetition
+      if (currentCardIndex < sessionQueue.length - 1) {
+        const reinsertIndex = Math.min(currentCardIndex + 3, sessionQueue.length);
+        sessionQueue.splice(reinsertIndex, 0, slug);
+        document.getElementById('session-progress')!.textContent = `${currentCardIndex + 1}/${sessionQueue.length}`;
+      }
       setTimeout(nextCard, 300);
     } else if (e.key === '2' && frontHidden) {
       const slug = sessionQueue[currentCardIndex];
