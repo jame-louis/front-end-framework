@@ -1,21 +1,38 @@
+/// Course configuration
 // Site configuration
 export const site = {
-  title: '课程网站',
-  description: '基于 Astro 的课程内容管理系统',
+  title: '前端框架技术',
+  description: '基于 Vue.js、Bootstrap 等框架的前端开发技术课程',
   lang: 'zh-CN',
   separator: ' - ',
 } as const;
 
 // Course information
 export const courseInfo = {
-  name: '课程',
-  subtitle: '专业必修/选修课',
-  description: '在这里填写课程的简要描述，介绍课程目标、适用人群和学习成果。',
+  name: 'Web前端框架技术',
+  subtitle: '专业选修课',
+  description: '本课程以JavaScript、Bootstrap和Vue.js等知识为核心内容，使学生具备软件的前端开发能力，适应PC端和移动端的开发。',
   textbook: '《示例教材》(出版社)',
   prerequisites: '计算机基础、程序设计入门',
   assessment: '出勤(10%) + 平时(30%) + 期末(60%)',
 } as const;
 
+
+export const courseModules = [
+  { name: 'JavaScript基础', description: '课程介绍、环境搭建、开发工具' },
+  { name: 'Bootstrap框架', description: '响应式设计、组件化思想、现代前端开发流程' },
+  { name: 'Vue.js框架', description: '响应式设计、组件化思想、现代前端开发流程' },
+] as const;
+
+
+export const courseObjectives = [
+  '掌握现代前端开发的核心概念和技术栈',
+  '熟练使用主流前端框架进行项目开发',
+  '理解响应式设计和组件化开发思想',
+  '具备独立分析和解决前端问题的能力',
+] as const;
+
+/// configurations 
 // Home page actions
 export const homeActions = {
   primary: { label: '开始学习', href: '/lectures' },
@@ -33,8 +50,8 @@ export const mainNavItems = [
 ] as const;
 
 export const footerConfig = {
-  text: '课程 - 专业必修/选修课',
-  copyright: '课程',
+  text: 'Per aspera ad astra',
+  copyright: 'jamelouis',
 } as const;
 
 export const pageTitles = {
@@ -47,11 +64,6 @@ export const pageTitles = {
 } as const;
 
 // Course modules
-export const courseModules = [
-  { name: 'JavaScript基础', description: '课程介绍、环境搭建、开发工具' },
-  { name: 'Bootstrap框架', description: '响应式设计、组件化思想、现代前端开发流程' },
-  { name: 'Vue.js框架', description: '响应式设计、组件化思想、现代前端开发流程' },
-] as const;
 
 export const moduleNames = courseModules.map(m => m.name);
 
@@ -89,14 +101,9 @@ export const lectureLabels = {
   countSuffix: '讲课程',
   moduleCountTemplate: '包含 {count} 讲课程',
   hasSlidesBadge: '有课件',
-<<<<<<< HEAD
-  slidevBanner: '本讲提供 Slidev 在线课件',
-  relatedAssignment: '相关作业',
-=======
   hasAssignmentBadge: '有作业',
   slidevBanner: '本讲提供 Slidev 在线课件',
   relatedAssignment: '课后作业',
->>>>>>> template/main
 } as const;
 
 export const assignmentLabels = {
@@ -131,12 +138,6 @@ export const tocConfig = {
 } as const;
 
 // Course objectives (for syllabus)
-export const courseObjectives = [
-  '掌握现代前端开发的核心概念和技术栈',
-  '熟练使用主流前端框架进行项目开发',
-  '理解响应式设计和组件化开发思想',
-  '具备独立分析和解决前端问题的能力',
-] as const;
 
 export const categoryLabels: Record<string, string> = {
   lectures: '讲义',
