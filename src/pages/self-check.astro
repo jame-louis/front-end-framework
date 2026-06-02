@@ -2,15 +2,23 @@
 import CourseLayout from '../layouts/CourseLayout.astro';
 import { getCollection } from 'astro:content';
 import { moduleNames } from '../config';
+import { validateModules, logModuleWarnings, isValidModule } from '../lib/moduleValidation';
 
 const selfchecks = await getCollection('selfchecks', (entry) => !entry.data.draft);
+
+// Validate modules and log warnings
+const validation = await validateModules();
+logModuleWarnings(validation);
+
+// Filter valid selfchecks only
+const validSelfchecks = selfchecks.filter(sc => isValidModule(sc.data.module));
 
 // Group by module
 const byModule = new Map();
 for (const module of moduleNames) {
   byModule.set(module, []);
 }
-for (const sc of selfchecks) {
+for (const sc of validSelfchecks) {
   const list = byModule.get(sc.data.module) || [];
   list.push(sc);
   byModule.set(sc.data.module, list);
@@ -49,13 +57,13 @@ const base = import.meta.env.BASE_URL;
 
     <!-- Progress -->
     <div class="mb-6 flex items-center justify-between text-sm text-gray-600">
-      <span id="progress-text">已查看: 0 / {selfchecks.length}</span>
+      <span id="progress-text">已查看: 0 / {validSelfchecks.length}</span>
       <button id="reset-progress" class="text-primary hover:underline">重置进度</button>
     </div>
 
     <!-- Cards Grid -->
     <div class="grid gap-6" id="cards-container">
-      {selfchecks.map((sc, index) => (
+      {validSelfchecks.map((sc, index) => (
         <div
           class="selfcheck-card bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
           data-module={sc.data.module}
