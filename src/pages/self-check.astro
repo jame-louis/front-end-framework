@@ -28,29 +28,21 @@ const base = import.meta.env.BASE_URL;
 ---
 
 <CourseLayout title="自我检测">
-  <div class="max-w-3xl mx-auto px-4 py-8">
-    <header class="mb-8 text-center">
-      <h1 class="text-4xl font-bold text-gray-900 mb-4 flex items-center justify-center gap-3">
-        <span class="text-5xl">🎯</span>
-        <span>自我检测</span>
-      </h1>
-      <p class="text-gray-600 max-w-xl mx-auto leading-relaxed">
+  <div class="max-w-2xl mx-auto px-4 py-8">
+    <header class="mb-6">
+      <h1 class="text-3xl font-bold text-gray-900 mb-3">自我检测</h1>
+      <p class="text-gray-600">
         通过主动回忆强化学习效果。基于间隔重复算法，优先复习掌握不牢的知识点。
+        <span class="text-sm text-gray-500 block mt-1">快捷键: 空格/回车=翻转, 1=不熟悉, 2=一般, 3=已掌握, →/Enter=下一题</span>
       </p>
     </header>
 
     <!-- Mode Toggle -->
-    <div class="flex gap-2 mb-8 p-1.5 bg-gray-100 rounded-xl w-fit">
-      <button id="mode-study" class="mode-btn px-5 py-2.5 rounded-lg text-sm font-semibold transition-all bg-white text-gray-900 shadow-sm flex items-center gap-2" data-mode="study">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-        </svg>
+    <div class="flex gap-2 mb-6 p-1 bg-gray-100 rounded-lg w-fit">
+      <button id="mode-study" class="mode-btn px-4 py-2 rounded-md text-sm font-medium transition-all bg-white text-gray-900 shadow-sm" data-mode="study">
         学习模式
       </button>
-      <button id="mode-browse" class="mode-btn px-5 py-2.5 rounded-lg text-sm font-semibold transition-all text-gray-600 hover:text-gray-900 flex items-center gap-2" data-mode="browse">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-        </svg>
+      <button id="mode-browse" class="mode-btn px-4 py-2 rounded-md text-sm font-medium transition-all text-gray-600 hover:text-gray-900" data-mode="browse">
         浏览模式
       </button>
     </div>
@@ -69,37 +61,30 @@ const base = import.meta.env.BASE_URL;
       </div>
 
       <!-- Session Setup -->
-      <div id="session-setup" class="bg-white rounded-2xl shadow-lg border border-gray-200 p-10 text-center">
-        <div class="text-6xl mb-4 empty-emoji">🎯</div>
-        <h2 class="text-2xl font-bold text-gray-900 mb-3">开始复习会话</h2>
-        <p class="text-gray-600 mb-8">根据你的掌握程度，今天有 <span id="due-count" class="font-bold text-primary text-lg bg-primary/10 px-3 py-1 rounded-full">0</span> 道题待复习</p>
-        <div class="flex gap-4 justify-center">
-          <button id="start-session" class="px-8 py-4 bg-primary text-white rounded-xl font-semibold transition-all flex items-center gap-2 text-lg">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+      <div id="session-setup" class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
+        <div class="text-5xl mb-4">🎯</div>
+        <h2 class="text-xl font-semibold text-gray-900 mb-2">开始复习会话</h2>
+        <p class="text-gray-600 mb-6">根据你的掌握程度，今天有 <span id="due-count" class="font-semibold text-primary">0</span> 道题待复习</p>
+        <div class="flex gap-3 justify-center">
+          <button id="start-session" class="px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors">
             开始复习
           </button>
-          <button id="start-all" class="px-8 py-4 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-all flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
+          <button id="start-all" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors">
             全部打乱练习
           </button>
         </div>
-        <div class="mt-8 flex justify-center gap-8 text-sm">
-          <div class="flex items-center gap-2 px-4 py-2 bg-red-50 rounded-full">
+        <div class="mt-6 flex justify-center gap-6 text-sm text-gray-500">
+          <div class="flex items-center gap-2">
             <span class="w-3 h-3 rounded-full bg-red-400"></span>
-            <span class="text-red-700 font-medium">需复习</span>
+            <span>需复习</span>
           </div>
-          <div class="flex items-center gap-2 px-4 py-2 bg-yellow-50 rounded-full">
+          <div class="flex items-center gap-2">
             <span class="w-3 h-3 rounded-full bg-yellow-400"></span>
-            <span class="text-yellow-700 font-medium">较生疏</span>
+            <span>较生疏</span>
           </div>
-          <div class="flex items-center gap-2 px-4 py-2 bg-green-50 rounded-full">
+          <div class="flex items-center gap-2">
             <span class="w-3 h-3 rounded-full bg-green-400"></span>
-            <span class="text-green-700 font-medium">已掌握</span>
+            <span>已掌握</span>
           </div>
         </div>
       </div>
@@ -107,189 +92,107 @@ const base = import.meta.env.BASE_URL;
       <!-- Active Session -->
       <div id="active-session" class="hidden">
         <!-- Progress Bar -->
-        <div class="mb-6">
-          <div class="flex justify-between text-sm mb-3">
-            <div class="flex items-center gap-2">
-              <span class="text-gray-700 font-medium">进度</span>
-              <span id="session-progress" class="bg-primary/10 text-primary px-2 py-0.5 rounded-full font-bold">1/10</span>
-            </div>
-            <div class="flex items-center gap-3 text-xs">
-              <span class="flex items-center gap-1 text-green-600">
-                <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                <span id="stat-easy">0</span>
-              </span>
-              <span class="flex items-center gap-1 text-yellow-600">
-                <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
-                <span id="stat-medium">0</span>
-              </span>
-              <span class="flex items-center gap-1 text-red-600">
-                <span class="w-2 h-2 rounded-full bg-red-500"></span>
-                <span id="stat-hard">0</span>
-              </span>
-            </div>
+        <div class="mb-4">
+          <div class="flex justify-between text-sm text-gray-600 mb-2">
+            <span>进度 <span id="session-progress">1/10</span></span>
+            <span id="session-stats" class="text-gray-500">掌握: 0 | 复习: 0</span>
           </div>
-          <div class="progress-bar-container h-3 bg-gray-200 rounded-full overflow-hidden">
-            <div id="progress-bar" class="h-full transition-all duration-500" style="width: 10%"></div>
+          <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div id="progress-bar" class="h-full bg-primary transition-all duration-300" style="width: 10%"></div>
           </div>
         </div>
 
-        <!-- Single Card with Flip Animation -->
-        <div id="flashcard" class="card-flip-container min-h-[420px]">
-          <div class="card-inner" id="card-inner">
-            <!-- Front -->
-            <div class="card-face card-face-front bg-white rounded-2xl shadow-xl border border-gray-200 p-8">
-              <div class="flex items-center justify-between mb-6">
-                <span id="card-module" class="module-badge inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold text-blue-700">
-                  模块
-                </span>
-                <div class="flex items-center gap-2 text-xs text-gray-400">
-                  <span class="keyboard-hint">Space</span>
-                  <span>翻转卡片</span>
-                </div>
-              </div>
+        <!-- Single Card -->
+        <div id="flashcard" class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden min-h-[320px] relative">
+          <!-- Front -->
+          <div id="card-front" class="p-8 flex flex-col h-full min-h-[320px]">
+            <div class="flex items-center justify-between mb-4">
+              <span id="card-module" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
+                模块
+              </span>
+              <span id="card-counter" class="text-xs text-gray-400">1 / 10</span>
+            </div>
+            <div class="flex-1 flex items-center justify-center">
+              <h3 id="card-question" class="text-xl font-medium text-gray-900 text-center leading-relaxed">
+                加载中...
+              </h3>
+            </div>
+            <button id="reveal-btn" class="w-full py-3 px-4 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors flex items-center justify-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              显示答案 (空格)
+            </button>
+          </div>
 
-              <div class="flex-1 flex items-center justify-center py-8">
-                <h3 id="card-question" class="question-text text-center max-w-xl">
-                  加载中...
-                </h3>
-              </div>
+          <!-- Back -->
+          <div id="card-back" class="hidden p-8 bg-gray-50 min-h-[320px]">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs text-gray-500 uppercase tracking-wider font-medium">答案</span>
+              <span id="card-counter-back" class="text-xs text-gray-400">1 / 10</span>
+            </div>
+            <p id="card-answer" class="text-gray-900 font-medium mb-4 text-lg"></p>
 
-              <div class="mt-6">
-                <button id="reveal-btn" class="w-full py-4 px-6 bg-primary text-white rounded-xl font-semibold transition-all flex items-center justify-center gap-3 text-lg">
-                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                  显示答案
-                </button>
-                <p class="text-center text-sm text-gray-400 mt-3">
-                  或按 <span class="keyboard-hint">Space</span> / <span class="keyboard-hint">Enter</span>
-                </p>
-              </div>
-
-              <div class="flex justify-between items-center mt-6 pt-4 border-t border-gray-100">
-                <span id="card-counter" class="text-sm text-gray-400 font-medium">1 / 10</span>
-                <div class="flex items-center gap-2">
-                  <div class="w-2 h-2 rounded-full bg-red-400"></div>
-                  <div class="w-2 h-2 rounded-full bg-yellow-400"></div>
-                  <div class="w-2 h-2 rounded-full bg-green-400"></div>
-                </div>
-              </div>
+            <div class="border-t border-gray-200 pt-4 mt-4">
+              <span class="text-xs text-gray-500 uppercase tracking-wider font-medium block mb-2">详细解释</span>
+              <p id="card-explanation" class="text-gray-700 text-sm leading-relaxed"></p>
             </div>
 
-            <!-- Back -->
-            <div class="card-face card-face-back bg-gradient-to-br from-gray-50 to-white rounded-2xl shadow-xl border border-gray-200 p-8">
-              <div class="flex items-center justify-between mb-6">
-                <span class="inline-flex items-center gap-2 text-xs font-bold text-green-600 uppercase tracking-wider">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  答案
-                </span>
-                <div class="flex items-center gap-2 text-xs text-gray-400">
-                  <span id="card-counter-back" class="font-medium">1 / 10</span>
-                </div>
-              </div>
+            <div id="card-tags" class="mt-4 flex flex-wrap gap-2"></div>
 
-              <p id="card-answer" class="answer-text mb-6"></p>
-
-              <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm mb-5">
-                <span class="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-2 mb-3">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  详细解释
-                </span>
-                <p id="card-explanation" class="explanation-text text-sm"></p>
-              </div>
-
-              <div id="card-tags" class="flex flex-wrap gap-2 mb-6"></div>
-
-              <div class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-5">
-                <p class="text-sm font-medium text-gray-700 mb-4 text-center flex items-center justify-center gap-2">
-                  <span>🎯</span>
-                  你对这个知识点的掌握程度？
-                  <span class="text-xs text-gray-400 font-normal">(选择后自动下一题)</span>
-                </p>
-                <div class="flex gap-3">
-                  <button class="confidence-btn flex-1 py-3 px-2 rounded-xl border-2 border-red-200 bg-white text-red-600 font-semibold" data-level="1">
-                    <span class="block text-2xl mb-1">😵</span>
-                    <span class="text-sm">不熟悉</span>
-                    <span class="keyboard-hint block mt-1 text-xs">1</span>
-                  </button>
-                  <button class="confidence-btn flex-1 py-3 px-2 rounded-xl border-2 border-yellow-200 bg-white text-yellow-600 font-semibold" data-level="2">
-                    <span class="block text-2xl mb-1">🤔</span>
-                    <span class="text-sm">一般</span>
-                    <span class="keyboard-hint block mt-1 text-xs">2</span>
-                  </button>
-                  <button class="confidence-btn flex-1 py-3 px-2 rounded-xl border-2 border-green-200 bg-white text-green-600 font-semibold" data-level="3">
-                    <span class="block text-2xl mb-1">✅</span>
-                    <span class="text-sm">已掌握</span>
-                    <span class="keyboard-hint block mt-1 text-xs">3</span>
-                  </button>
-                </div>
+            <div class="mt-6">
+              <p class="text-sm text-gray-600 mb-3 text-center">你对这个知识点的掌握程度？</p>
+              <div class="flex gap-3">
+                <button class="confidence-btn flex-1 py-3 px-3 rounded-lg border-2 border-red-200 text-red-600 text-sm font-medium hover:bg-red-50 transition-colors" data-level="1">
+                  <span class="block text-lg mb-1">😵</span>
+                  不熟悉 (1)
+                </button>
+                <button class="confidence-btn flex-1 py-3 px-3 rounded-lg border-2 border-yellow-200 text-yellow-600 text-sm font-medium hover:bg-yellow-50 transition-colors" data-level="2">
+                  <span class="block text-lg mb-1">🤔</span>
+                  一般 (2)
+                </button>
+                <button class="confidence-btn flex-1 py-3 px-3 rounded-lg border-2 border-green-200 text-green-600 text-sm font-medium hover:bg-green-50 transition-colors" data-level="3">
+                  <span class="block text-lg mb-1">✅</span>
+                  已掌握 (3)
+                </button>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Keyboard hint -->
-        <div class="flex justify-center gap-3 mt-6">
-          <span class="inline-flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-gray-200 text-sm text-gray-600 shadow-sm">
-            <span class="keyboard-hint">Space</span>
-            <span>翻转</span>
-          </span>
-          <span class="inline-flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-gray-200 text-sm text-gray-600 shadow-sm">
-            <span class="keyboard-hint">1</span>
-            <span>不熟</span>
-          </span>
-          <span class="inline-flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-gray-200 text-sm text-gray-600 shadow-sm">
-            <span class="keyboard-hint">2</span>
-            <span>一般</span>
-          </span>
-          <span class="inline-flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-gray-200 text-sm text-gray-600 shadow-sm">
-            <span class="keyboard-hint">3</span>
-            <span>掌握</span>
-          </span>
-          <span class="inline-flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-gray-200 text-sm text-gray-600 shadow-sm">
-            <span class="keyboard-hint">→</span>
-            <span>下一题</span>
-          </span>
-        </div>
+        <p class="text-center text-sm text-gray-400 mt-4">
+          快捷键: 1=不熟悉, 2=一般, 3=已掌握, →/Enter=下一题
+        </p>
       </div>
 
       <!-- Session Complete -->
-      <div id="session-complete" class="hidden bg-white rounded-2xl shadow-lg border border-gray-200 p-10 text-center">
-        <div class="text-7xl mb-4 empty-emoji">🎉</div>
-        <h2 class="text-3xl font-bold text-gray-900 mb-2">会话完成！</h2>
-        <p class="text-gray-600 mb-8">你的学习进度已保存</p>
+      <div id="session-complete" class="hidden bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
+        <div class="text-6xl mb-4">🎉</div>
+        <h2 class="text-2xl font-semibold text-gray-900 mb-2">会话完成！</h2>
+        <p class="text-gray-600 mb-6">你的学习进度已保存</p>
 
-        <div class="grid grid-cols-3 gap-4 mb-8">
-          <div class="stat-card p-5 bg-gradient-to-br from-red-50 to-red-100 rounded-xl border border-red-200">
-            <div id="stats-hard" class="text-3xl font-bold text-red-600 mb-1">0</div>
-            <div class="text-sm text-red-700 font-medium">需复习</div>
+        <div class="grid grid-cols-3 gap-4 mb-6">
+          <div class="p-4 bg-red-50 rounded-lg">
+            <div id="stats-hard" class="text-2xl font-bold text-red-600">0</div>
+            <div class="text-sm text-red-600">需复习</div>
           </div>
-          <div class="stat-card p-5 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl border border-yellow-200">
-            <div id="stats-medium" class="text-3xl font-bold text-yellow-600 mb-1">0</div>
-            <div class="text-sm text-yellow-700 font-medium">较生疏</div>
+          <div class="p-4 bg-yellow-50 rounded-lg">
+            <div id="stats-medium" class="text-2xl font-bold text-yellow-600">0</div>
+            <div class="text-sm text-yellow-600">较生疏</div>
           </div>
-          <div class="stat-card p-5 bg-gradient-to-br from-green-50 to-green-100 rounded-xl border border-green-200">
-            <div id="stats-easy" class="text-3xl font-bold text-green-600 mb-1">0</div>
-            <div class="text-sm text-green-700 font-medium">已掌握</div>
+          <div class="p-4 bg-green-50 rounded-lg">
+            <div id="stats-easy" class="text-2xl font-bold text-green-600">0</div>
+            <div class="text-sm text-green-600">已掌握</div>
           </div>
         </div>
 
-        <div class="flex gap-4 justify-center">
-          <button id="start-new-session" class="px-8 py-4 bg-primary text-white rounded-xl font-semibold transition-all flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
+        <div class="flex gap-3 justify-center">
+          <button id="start-new-session" class="px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors">
             继续学习
           </button>
-          <button id="end-session" class="px-8 py-4 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-all flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-            </svg>
+          <button id="end-session" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors">
             结束
           </button>
         </div>
@@ -317,81 +220,63 @@ const base = import.meta.env.BASE_URL;
       </div>
 
       <!-- Cards Grid -->
-      <div class="grid gap-5" id="cards-container">
+      <div class="grid gap-4" id="cards-container">
         {validSelfchecks.map((sc, index) => (
           <div
-            class="selfcheck-card bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden"
+            class="selfcheck-card bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
             data-module={sc.data.module}
             data-index={index}
             data-slug={sc.slug}
           >
-            <div class="card-inner-browse">
+            <div class="card-inner">
               <!-- Front -->
-              <div class="card-front p-6">
-                <div class="flex items-start justify-between mb-4">
-                  <span class="module-badge inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold text-blue-700">
+              <div class="card-front p-5">
+                <div class="flex items-start justify-between mb-3">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
                     {sc.data.module}
                   </span>
-                  <span class="text-xs text-gray-400 font-medium">#{index + 1}</span>
+                  <span class="text-xs text-gray-400">#{index + 1}</span>
                 </div>
-                <h3 class="text-lg font-semibold text-gray-900 mb-4 leading-relaxed">{sc.data.question}</h3>
-                <button class="reveal-btn w-full py-3 px-4 bg-primary text-white rounded-xl font-medium transition-all flex items-center justify-center gap-2 group">
-                  <svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
+                <h3 class="text-base font-medium text-gray-900 mb-3">{sc.data.question}</h3>
+                <button class="reveal-btn w-full py-2 px-4 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors text-sm">
                   显示答案
                 </button>
               </div>
 
               <!-- Back -->
-              <div class="card-back hidden bg-gradient-to-br from-gray-50 to-white p-6">
-                <div class="flex items-center justify-between mb-4">
-                  <span class="inline-flex items-center gap-2 text-xs font-bold text-green-600 uppercase tracking-wider">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    答案
-                  </span>
-                  <button class="close-btn p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+              <div class="card-back p-5 bg-gray-50 hidden">
+                <div class="flex items-start justify-between mb-3">
+                  <span class="text-xs text-gray-500 uppercase tracking-wider font-medium">答案</span>
+                  <button class="close-btn p-1 text-gray-400 hover:text-gray-600">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
                 </div>
+                <p class="text-gray-900 font-medium mb-3">{sc.data.answer}</p>
 
-                <p class="text-lg font-semibold text-green-700 mb-4">{sc.data.answer}</p>
-
-                <div class="bg-white rounded-xl p-4 border border-gray-200 shadow-sm mb-4">
-                  <span class="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-2 mb-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    详细解释
-                  </span>
+                <div class="border-t border-gray-200 pt-3 mt-3">
+                  <span class="text-xs text-gray-500 uppercase tracking-wider font-medium block mb-2">详细解释</span>
                   <p class="text-gray-700 text-sm leading-relaxed">{sc.data.explanation}</p>
                 </div>
 
                 {sc.data.tags.length > 0 && (
-                  <div class="flex flex-wrap gap-2 mb-4">
+                  <div class="mt-3 flex flex-wrap gap-2">
                     {sc.data.tags.map(tag => (
-                      <span class="tag px-3 py-1 bg-white rounded-full text-xs text-gray-600 border border-gray-200 shadow-sm">{tag}</span>
+                      <span class="px-2 py-1 bg-white rounded text-xs text-gray-600 border border-gray-200">{tag}</span>
                     ))}
                   </div>
                 )}
 
-                <div class="flex gap-2">
-                  <button class="confidence-btn flex-1 py-2.5 px-3 rounded-lg border-2 border-red-200 bg-white text-red-600 text-sm font-semibold hover:bg-red-50 transition-colors flex items-center justify-center gap-1" data-level="1">
-                    <span>😵</span>
-                    <span>不熟</span>
+                <div class="mt-4 flex gap-2">
+                  <button class="confidence-btn flex-1 py-2 px-2 rounded-lg border-2 border-red-200 text-red-600 text-sm font-medium hover:bg-red-50 transition-colors" data-level="1">
+                    不熟
                   </button>
-                  <button class="confidence-btn flex-1 py-2.5 px-3 rounded-lg border-2 border-yellow-200 bg-white text-yellow-600 text-sm font-semibold hover:bg-yellow-50 transition-colors flex items-center justify-center gap-1" data-level="2">
-                    <span>🤔</span>
-                    <span>一般</span>
+                  <button class="confidence-btn flex-1 py-2 px-2 rounded-lg border-2 border-yellow-200 text-yellow-600 text-sm font-medium hover:bg-yellow-50 transition-colors" data-level="2">
+                    一般
                   </button>
-                  <button class="confidence-btn flex-1 py-2.5 px-3 rounded-lg border-2 border-green-200 bg-white text-green-600 text-sm font-semibold hover:bg-green-50 transition-colors flex items-center justify-center gap-1" data-level="3">
-                    <span>✅</span>
-                    <span>掌握</span>
+                  <button class="confidence-btn flex-1 py-2 px-2 rounded-lg border-2 border-green-200 text-green-600 text-sm font-medium hover:bg-green-50 transition-colors" data-level="3">
+                    掌握
                   </button>
                 </div>
               </div>
@@ -401,8 +286,8 @@ const base = import.meta.env.BASE_URL;
       </div>
 
       <!-- Empty State -->
-      <div id="empty-state" class="hidden text-center py-16">
-        <div class="text-6xl mb-4 empty-emoji">🎉</div>
+      <div id="empty-state" class="hidden text-center py-12">
+        <div class="text-6xl mb-4">🎉</div>
         <h3 class="text-xl font-semibold text-gray-900 mb-2">该模块暂无题目</h3>
         <p class="text-gray-600">请尝试选择其他模块</p>
       </div>
@@ -519,12 +404,10 @@ const base = import.meta.env.BASE_URL;
   }
 
   function updateSessionStatsDisplay() {
-    const easyEl = document.getElementById('stat-easy');
-    const mediumEl = document.getElementById('stat-medium');
-    const hardEl = document.getElementById('stat-hard');
-    if (easyEl) easyEl.textContent = String(sessionStats.easy);
-    if (mediumEl) mediumEl.textContent = String(sessionStats.medium);
-    if (hardEl) hardEl.textContent = String(sessionStats.hard);
+    const statsEl = document.getElementById('session-stats');
+    if (statsEl) {
+      statsEl.textContent = `掌握: ${sessionStats.easy} | 复习: ${sessionStats.totalReviewed}`;
+    }
   }
 
   function getDueCards(moduleFilter: string = 'all'): CardData[] {
@@ -619,11 +502,12 @@ const base = import.meta.env.BASE_URL;
     // Tags
     const tagsContainer = document.getElementById('card-tags')!;
     tagsContainer.innerHTML = card.tags.map(tag =>
-      `<span class="tag px-3 py-1 bg-white rounded-full text-xs text-gray-600 border border-gray-200 shadow-sm">${tag}</span>`
+      `<span class="px-2 py-1 bg-white rounded text-xs text-gray-600 border border-gray-200">${tag}</span>`
     ).join('');
 
-    // Reset card flip state
-    document.getElementById('card-inner')?.classList.remove('flipped');
+    // Reset card state
+    document.getElementById('card-front')?.classList.remove('hidden');
+    document.getElementById('card-back')?.classList.add('hidden');
 
     // Update progress
     const progress = ((currentCardIndex) / sessionQueue.length) * 100;
@@ -643,7 +527,8 @@ const base = import.meta.env.BASE_URL;
   }
 
   function revealCard() {
-    document.getElementById('card-inner')?.classList.add('flipped');
+    document.getElementById('card-front')?.classList.add('hidden');
+    document.getElementById('card-back')?.classList.remove('hidden');
   }
 
   function nextCard() {
@@ -779,16 +664,16 @@ const base = import.meta.env.BASE_URL;
     if (currentMode !== 'study') return;
     if (document.getElementById('active-session')?.classList.contains('hidden')) return;
 
-    const isFlipped = document.getElementById('card-inner')?.classList.contains('flipped');
+    const frontHidden = document.getElementById('card-front')?.classList.contains('hidden');
 
     if (e.key === ' ' || e.key === 'Enter') {
       e.preventDefault();
-      if (!isFlipped) {
+      if (!frontHidden) {
         revealCard();
       } else {
         nextCard();
       }
-    } else if (e.key === '1' && isFlipped) {
+    } else if (e.key === '1' && frontHidden) {
       const slug = sessionQueue[currentCardIndex];
       rateCard(slug, 1);
       // Re-insert hard cards for spaced repetition
@@ -798,15 +683,15 @@ const base = import.meta.env.BASE_URL;
         document.getElementById('session-progress')!.textContent = `${currentCardIndex + 1}/${sessionQueue.length}`;
       }
       setTimeout(nextCard, 300);
-    } else if (e.key === '2' && isFlipped) {
+    } else if (e.key === '2' && frontHidden) {
       const slug = sessionQueue[currentCardIndex];
       rateCard(slug, 2);
       setTimeout(nextCard, 300);
-    } else if (e.key === '3' && isFlipped) {
+    } else if (e.key === '3' && frontHidden) {
       const slug = sessionQueue[currentCardIndex];
       rateCard(slug, 3);
       setTimeout(nextCard, 300);
-    } else if (e.key === 'ArrowRight' && isFlipped) {
+    } else if (e.key === 'ArrowRight' && frontHidden) {
       nextCard();
     }
   });
@@ -837,64 +722,13 @@ const base = import.meta.env.BASE_URL;
 </script>
 
 <style>
-  /* ==================== Card Flip Animation ==================== */
-  .card-flip-container {
-    perspective: 1200px;
-    transform-style: preserve-3d;
-  }
-
-  .card-inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    transform-style: preserve-3d;
-  }
-
-  .card-inner.flipped {
-    transform: rotateY(180deg);
-  }
-
-  .card-face {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-  }
-
-  .card-face-back {
-    transform: rotateY(180deg);
-  }
-
-  /* ==================== Browse Mode Cards ==================== */
-  .selfcheck-card {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .selfcheck-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
-  }
-
   .card-back {
     display: none;
   }
 
   .card-back:not(.hidden) {
     display: block;
-    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    animation: fadeIn 0.2s ease-out;
   }
 
   @keyframes fadeIn {
@@ -902,158 +736,12 @@ const base = import.meta.env.BASE_URL;
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* ==================== Filter Buttons ==================== */
-  .filter-btn {
-    transition: all 0.2s ease;
-  }
-
-  .filter-btn:hover {
-    transform: translateY(-1px);
-  }
-
   .filter-btn.active {
-    background: linear-gradient(135deg, var(--color-primary, #3b82f6), var(--color-primary-dark, #2563eb));
+    background-color: var(--color-primary, #3b82f6);
     color: white;
-    box-shadow: 0 4px 12px -4px var(--color-primary, #3b82f6);
   }
 
-  /* ==================== Confidence Buttons ==================== */
-  .confidence-btn {
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .confidence-btn::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: currentColor;
-    opacity: 0.1;
-    transform: translate(-50%, -50%);
-    transition: width 0.3s, height 0.3s;
-  }
-
-  .confidence-btn:hover::before {
-    width: 100%;
-    height: 100%;
-  }
-
-  .confidence-btn:active {
-    transform: scale(0.96);
-  }
-
-  .confidence-btn.selected {
-    transform: scale(1.02);
-  }
-
-  /* ==================== Progress Bar ==================== */
-  .progress-bar-container {
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-
-  #progress-bar {
-    background: linear-gradient(90deg, var(--color-primary, #3b82f6), var(--color-primary-dark, #2563eb));
-    box-shadow: 0 2px 8px -2px var(--color-primary, #3b82f6);
-  }
-
-  /* ==================== Tags ==================== */
-  .tag {
-    transition: all 0.2s ease;
-  }
-
-  .tag:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  /* ==================== Study Card Specific ==================== */
   #flashcard {
-    perspective: 1200px;
-    transform-style: preserve-3d;
-  }
-
-  .question-text {
-    font-size: 1.5rem;
-    line-height: 1.6;
-    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .answer-text {
-    font-size: 1.25rem;
-    color: #059669;
-    font-weight: 600;
-  }
-
-  .explanation-text {
-    line-height: 1.8;
-    color: #4b5563;
-  }
-
-  /* ==================== Reveal Button ==================== */
-  #reveal-btn {
-    background: linear-gradient(135deg, var(--color-primary, #3b82f6), var(--color-primary-dark, #2563eb));
-    box-shadow: 0 4px 14px -4px var(--color-primary, #3b82f6);
-    transition: all 0.2s ease;
-  }
-
-  #reveal-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px -4px var(--color-primary, #3b82f6);
-  }
-
-  #reveal-btn:active {
-    transform: translateY(0);
-  }
-
-  /* ==================== Mode Toggle ==================== */
-  .mode-btn {
-    transition: all 0.2s ease;
-  }
-
-  .mode-btn:hover:not(.bg-white) {
-    background-color: rgba(255, 255, 255, 0.5);
-  }
-
-  /* ==================== Stats Cards ==================== */
-  .stat-card {
-    transition: all 0.3s ease;
-  }
-
-  .stat-card:hover {
-    transform: translateY(-2px);
-  }
-
-  /* ==================== Empty State ==================== */
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-  }
-
-  .empty-emoji {
-    animation: float 3s ease-in-out infinite;
-  }
-
-  /* ==================== Module Badge ==================== */
-  .module-badge {
-    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-    border: 1px solid rgba(59, 130, 246, 0.2);
-  }
-
-  /* ==================== Keyboard Shortcuts ==================== */
-  .keyboard-hint {
-    font-family: 'SF Mono', Monaco, monospace;
-    background: #f3f4f6;
-    padding: 2px 6px;
-    border-radius: 4px;
-    border: 1px solid #e5e7eb;
-    font-size: 0.75rem;
+    perspective: 1000px;
   }
 </style>
