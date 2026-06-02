@@ -1,12 +1,12 @@
 import { defineCollection, z } from 'astro:content';
-import { moduleNames, contentDefaults } from './config';
+import { contentDefaults } from './config';
 
 const lectures = defineCollection({
   type: 'content',
   schema: z.object({
     title: z.string(),
     lectureNumber: z.number(),
-    module: z.enum(moduleNames),
+    module: z.string(),
     description: z.string(),
     duration: z.string().default(contentDefaults.duration),
     difficulty: z.enum(['beginner', 'intermediate', 'advanced']).default('beginner'),
@@ -42,7 +42,7 @@ const selfchecks = defineCollection({
     question: z.string(),
     answer: z.string(),
     explanation: z.string(),
-    module: z.enum(moduleNames),
+    module: z.string(),
     tags: z.array(z.string()).default([]),
     relatedLectures: z.array(z.string()).default([]),
     draft: z.boolean().default(false),

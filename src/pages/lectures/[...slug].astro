@@ -91,6 +91,17 @@ const relatedAssignment = allAssignments.find(a => a.data.lectureRef === slug &&
             {lectureLabels.hasSlidesBadge}
           </span>
         )}
+        {relatedAssignment && (
+          <span class="px-2 py-1 bg-orange-50 text-orange-700 border border-orange-200 rounded-md text-xs font-medium flex items-center gap-1">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            {lectureLabels.hasAssignmentBadge}
+          </span>
+        )}
+        <span class="ml-auto text-xs text-text-muted">
+          {currentIndex + 1} / {sorted.length}
+        </span>
       </div>
     </header>
 
@@ -113,94 +124,127 @@ const relatedAssignment = allAssignments.find(a => a.data.lectureRef === slug &&
       </div>
     )}
 
-    <!-- Mark Complete Button -->
-    <div class="mb-6 sm:mb-8">
-      <button
-        id="mark-complete-btn"
-        data-slug={slug}
-        class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-green-500 text-green-600 font-medium hover:bg-green-50 transition-colors"
-      >
-        <svg id="complete-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-        </svg>
-        <span id="complete-text">{labels.markComplete}</span>
-      </button>
-    </div>
-
-    <!-- Related Assignment -->
-    {relatedAssignment && (
-      <div class="mb-6 sm:mb-8 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-        <div class="flex items-start sm:items-center gap-3">
-          <span class="text-xl sm:text-2xl flex-shrink-0">📝</span>
-          <div class="flex-1 min-w-0">
-            <p class="text-orange-800 text-sm sm:text-base m-0 font-medium">
-              {lectureLabels.relatedAssignment}: {relatedAssignment.data.title}
-            </p>
-          </div>
-          <a
-            href={`${base}assignments/${relatedAssignment.id.replace('.md', '')}`}
-            class="flex-shrink-0 text-sm font-medium text-orange-600 hover:text-orange-800 whitespace-nowrap"
-          >
-            {labels.viewDetails}
-          </a>
-        </div>
-      </div>
-    )}
-
     <!-- Content -->
     <div class="prose-custom">
       <Content />
     </div>
-  </article>
 
-  <!-- Prev/Next Navigation -->
-  <nav class="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-border">
-    <div class="grid grid-cols-2 gap-3 sm:gap-4">
-      {prev ? (
-        <a
-          href={`${base}lectures/${prev.id.replace('.md', '')}`}
-          class="group flex flex-col p-3 sm:p-4 bg-bg-secondary rounded-lg border border-border hover:border-primary hover:bg-white transition-all"
-        >
-          <span class="text-xs sm:text-sm text-text-muted flex items-center gap-1 mb-1">
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-            {labels.previous}
-          </span>
-          <span class="font-medium text-sm sm:text-base line-clamp-2 group-hover:text-primary transition-colors">
-            {prev.data.title}
-          </span>
-        </a>
-      ) : (
-        <div class="p-3 sm:p-4 bg-bg-secondary rounded-lg border border-border opacity-50">
-          <span class="text-xs sm:text-sm text-text-muted">{labels.previous}</span>
-          <span class="block font-medium text-sm sm:text-base text-text-muted">{labels.none}</span>
-        </div>
-      )}
-
-      {next ? (
-        <a
-          href={`${base}lectures/${next.id.replace('.md', '')}`}
-          class="group flex flex-col items-end text-right p-3 sm:p-4 bg-bg-secondary rounded-lg border border-border hover:border-primary hover:bg-white transition-all"
-        >
-          <span class="text-xs sm:text-sm text-text-muted flex items-center gap-1 mb-1">
-            {labels.next}
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <!-- Related Assignment (below content) -->
+    {relatedAssignment && (
+      <div class="mt-8 sm:mt-12 p-6 bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-200 rounded-xl">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-orange-800 text-sm font-medium m-0">{lectureLabels.relatedAssignment}</p>
+              <p class="text-orange-900 text-lg font-semibold m-0">{relatedAssignment.data.title}</p>
+              {relatedAssignment.data.estimatedHours && (
+                <p class="text-orange-600 text-xs mt-1 m-0 flex items-center gap-1">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  预计 {relatedAssignment.data.estimatedHours} 小时
+                </p>
+              )}
+            </div>
+          </div>
+          <a
+            href={`${base}assignments/${relatedAssignment.id.replace('.md', '')}`}
+            class="sm:ml-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors shadow-sm hover:shadow-md"
+          >
+            {labels.viewDetails}
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
-          </span>
-          <span class="font-medium text-sm sm:text-base line-clamp-2 group-hover:text-primary transition-colors">
-            {next.data.title}
-          </span>
-        </a>
-      ) : (
-        <div class="p-3 sm:p-4 bg-bg-secondary rounded-lg border border-border opacity-50 text-right">
-          <span class="text-xs sm:text-sm text-text-muted">{labels.next}</span>
-          <span class="block font-medium text-sm sm:text-base text-text-muted">{labels.none}</span>
+          </a>
         </div>
-      )}
+      </div>
+    )}
+  </article>
+
+  <!-- Floating Footer with Navigation and Mark Complete -->
+  <nav id="lecture-footer" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-border shadow-lg z-40 transition-transform duration-300" style="padding-bottom: env(safe-area-inset-bottom, 0px);">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 sm:h-20 gap-4">
+        <!-- Previous -->
+        {prev ? (
+          <a
+            href={`${base}lectures/${prev.id.replace('.md', '')}`}
+            class="group flex items-center gap-2 sm:gap-3 px-3 py-2 rounded-lg hover:bg-bg-secondary transition-colors min-w-0"
+          >
+            <svg class="w-5 h-5 text-text-muted group-hover:text-primary transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            <div class="hidden sm:flex flex-col min-w-0 text-left">
+              <span class="text-xs text-text-muted">{labels.previous}</span>
+              <span class="text-sm font-medium text-text group-hover:text-primary transition-colors truncate max-w-[150px] lg:max-w-[200px]">{prev.data.title}</span>
+            </div>
+          </a>
+        ) : (
+          <div class="flex items-center gap-2 sm:gap-3 px-3 py-2 opacity-40">
+            <svg class="w-5 h-5 text-text-muted flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            <div class="hidden sm:flex flex-col min-w-0 text-left">
+              <span class="text-xs text-text-muted">{labels.previous}</span>
+              <span class="text-sm font-medium">{labels.none}</span>
+            </div>
+          </div>
+        )}
+
+        <!-- Mark Complete Button (Center) -->
+        <button
+          id="mark-complete-btn"
+          data-slug={slug}
+          class="group flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full font-medium transition-all duration-300 shadow-sm hover:shadow-md"
+        >
+          <div id="complete-icon-wrapper" class="relative w-6 h-6 flex items-center justify-center">
+            <svg id="complete-icon-default" class="w-5 h-5 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <svg id="complete-icon-checked" class="w-6 h-6 absolute opacity-0 scale-50 transition-all duration-300" fill="currentColor" viewBox="0 0 24 24">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <span id="complete-text" class="hidden sm:inline whitespace-nowrap"></span>
+          <span id="complete-text-mobile" class="sm:hidden whitespace-nowrap"></span>
+        </button>
+
+        <!-- Next -->
+        {next ? (
+          <a
+            href={`${base}lectures/${next.id.replace('.md', '')}`}
+            class="group flex items-center gap-2 sm:gap-3 px-3 py-2 rounded-lg hover:bg-bg-secondary transition-colors min-w-0"
+          >
+            <div class="hidden sm:flex flex-col min-w-0 text-right">
+              <span class="text-xs text-text-muted">{labels.next}</span>
+              <span class="text-sm font-medium text-text group-hover:text-primary transition-colors truncate max-w-[150px] lg:max-w-[200px]">{next.data.title}</span>
+            </div>
+            <svg class="w-5 h-5 text-text-muted group-hover:text-primary transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+        ) : (
+          <div class="flex items-center gap-2 sm:gap-3 px-3 py-2 opacity-40">
+            <div class="hidden sm:flex flex-col min-w-0 text-right">
+              <span class="text-xs text-text-muted">{labels.next}</span>
+              <span class="text-sm font-medium">{labels.none}</span>
+            </div>
+            <svg class="w-5 h-5 text-text-muted flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+        )}
+      </div>
     </div>
   </nav>
+
+  <!-- Spacer for fixed footer -->
+  <div class="h-20 sm:h-24"></div>
 
   <AITutor context={{ type: 'lecture', title: lecture.data.title, module: lecture.data.module }} />
 
@@ -209,7 +253,9 @@ const relatedAssignment = allAssignments.find(a => a.data.lectureRef === slug &&
 
     const btn = document.getElementById('mark-complete-btn');
     const text = document.getElementById('complete-text');
-    const icon = document.getElementById('complete-icon');
+    const textMobile = document.getElementById('complete-text-mobile');
+    const iconDefault = document.getElementById('complete-icon-default');
+    const iconChecked = document.getElementById('complete-icon-checked');
     const slug = btn?.getAttribute('data-slug');
 
     const labels = {
@@ -220,14 +266,24 @@ const relatedAssignment = allAssignments.find(a => a.data.lectureRef === slug &&
     function updateState() {
       if (!slug) return;
       const completed = isCompleted(slug);
+
       if (completed) {
+        // Completed state - filled green button
         text!.textContent = labels.completed;
-        btn!.classList.add('bg-green-50');
-        icon!.classList.add('text-green-600');
+        textMobile!.textContent = '已完成';
+        btn!.className = 'group flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full font-medium transition-all duration-300 shadow-sm bg-green-500 text-white hover:bg-green-600 hover:shadow-md';
+        iconDefault!.classList.add('opacity-0', 'scale-50');
+        iconChecked!.classList.remove('opacity-0', 'scale-50');
+        iconChecked!.classList.add('opacity-100', 'scale-100');
       } else {
+        // Incomplete state - outlined button
         text!.textContent = labels.markComplete;
-        btn!.classList.remove('bg-green-50');
-        icon!.classList.remove('text-green-600');
+        textMobile!.textContent = '完成';
+        btn!.className = 'group flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full font-medium transition-all duration-300 shadow-sm border-2 border-green-500 text-green-600 hover:bg-green-50 hover:shadow-md';
+        iconDefault!.classList.remove('opacity-0', 'scale-50');
+        iconDefault!.classList.add('opacity-100', 'scale-100');
+        iconChecked!.classList.add('opacity-0', 'scale-50');
+        iconChecked!.classList.remove('opacity-100', 'scale-100');
       }
     }
 
@@ -237,6 +293,35 @@ const relatedAssignment = allAssignments.find(a => a.data.lectureRef === slug &&
       if (!slug) return;
       toggleComplete(slug);
       updateState();
+
+      // Add a subtle bounce animation on click
+      btn!.classList.add('scale-95');
+      setTimeout(() => btn!.classList.remove('scale-95'), 150);
     });
+
+    // Hide footer when scrolling down, show when scrolling up
+    let lastScrollY = window.scrollY;
+    const footer = document.getElementById('lecture-footer');
+
+    window.addEventListener('scroll', () => {
+      const currentScrollY = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight;
+      const windowHeight = window.innerHeight;
+
+      // Always show at bottom of page
+      if (currentScrollY + windowHeight >= docHeight - 100) {
+        footer!.classList.remove('translate-y-full');
+        return;
+      }
+
+      // Hide when scrolling down, show when scrolling up
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        footer!.classList.add('translate-y-full');
+      } else {
+        footer!.classList.remove('translate-y-full');
+      }
+
+      lastScrollY = currentScrollY;
+    }, { passive: true });
   </script>
 </DocLayout>

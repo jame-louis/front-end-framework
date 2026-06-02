@@ -9,14 +9,19 @@ import {
   labels,
   pageTitles,
 } from '../config';
+import { validateModules, logModuleWarnings, isValidModule } from '../lib/moduleValidation';
 
 const base = import.meta.env.BASE_URL || '/';
 
 const lectures = await getCollection('lectures');
-const sortedLectures = lectures
-  .filter(l => !l.data.draft)
-  .sort((a, b) => a.data.lectureNumber - b.data.lectureNumber);
 
+// Validate modules and log warnings
+const validation = await validateModules();
+logModuleWarnings(validation);
+
+const validLectures = lectures
+  .filter(l => !l.data.draft && isValidModule(l.data.module))
+  .sort((a, b) => a.data.lectureNumber - b.data.lectureNumber);
 
 // Derive module stats from actual lecture data
 const assignments = await getCollection('assignments');
@@ -25,7 +30,7 @@ const assignmentsCount = assignments.filter(a => !a.data.draft).length;
 const moduleStats = courseModules.map((m, i) => ({
   name: m.name,
   description: m.description,
-  count: sortedLectures.filter(l => l.data.module === m.name).length,
+  count: validLectures.filter(l => l.data.module === m.name).length,
   icon: String(i + 1).padStart(2, '0'),
   color: i === 0 ? 'bg-blue-500' : 'bg-green-500',
 }));
@@ -65,7 +70,7 @@ const moduleStats = courseModules.map((m, i) => ({
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-center gap-8 sm:gap-12">
         <div class="text-center">
-          <div class="text-3xl font-bold text-primary">{sortedLectures.length}</div>
+          <div class="text-3xl font-bold text-primary">{validLectures.length}</div>
           <div class="text-text-muted text-sm mt-1">讲课程</div>
         </div>
         <div class="text-center">
@@ -104,7 +109,7 @@ const moduleStats = courseModules.map((m, i) => ({
         </a>
       </div>
       <div class="grid gap-4">
-        {sortedLectures.slice(0, 6).map(lecture => (
+        {validLectures.slice(0, 6).map(lecture => (
           <a
             href={`${base}lectures/${lecture.id.replace('.md', '')}`}
             class="flex items-center gap-4 p-4 bg-white rounded-lg border border-border hover:border-primary hover:shadow-sm transition-all"

@@ -2,16 +2,23 @@
 import CourseLayout from '../layouts/CourseLayout.astro';
 import { getCollection } from 'astro:content';
 import { courseModules, courseObjectives, syllabusLabels, labels, pageTitles } from '../config';
+import { validateModules, logModuleWarnings, isValidModule } from '../lib/moduleValidation';
 
 const base = import.meta.env.BASE_URL || '/';
 const lectures = await getCollection('lectures');
-const sortedLectures = lectures
-  .filter(l => !l.data.draft)
+
+// Validate modules and log warnings
+const validation = await validateModules();
+logModuleWarnings(validation);
+
+// Filter to valid modules only
+const validLectures = lectures
+  .filter(l => !l.data.draft && isValidModule(l.data.module))
   .sort((a, b) => a.data.lectureNumber - b.data.lectureNumber);
 
 // Derive module ranges from actual lecture data
 const moduleStats = courseModules.map(module => {
-  const moduleLectures = sortedLectures.filter(l => l.data.module === module.name);
+  const moduleLectures = validLectures.filter(l => l.data.module === module.name);
   const numbers = moduleLectures.map(l => l.data.lectureNumber);
   const min = numbers.length > 0 ? Math.min(...numbers) : null;
   const max = numbers.length > 0 ? Math.max(...numbers) : null;
@@ -63,7 +70,7 @@ const moduleStats = courseModules.map(module => {
     <section>
       <h2 class="text-xl font-semibold mb-6">{syllabusLabels.scheduleTitle}</h2>
       <div class="space-y-4">
-        {sortedLectures.map(lecture => (
+        {validLectures.map(lecture => (
           <div class="flex items-center gap-4 p-4 bg-bg-secondary rounded-lg border border-border">
             <span class="flex-shrink-0 w-12 h-12 bg-primary text-white rounded-md flex items-center justify-center font-bold">
               {lecture.data.lectureNumber}
